@@ -119,7 +119,6 @@ export const loginUser = async (req, res) => {
     const passwordMatch = await compare(password, user.password);
 
     if (!passwordMatch) {
-      console.log(password, user.password);
       return res.status(401).send({ message: "Email ou senha inválidos" });
     }
 
