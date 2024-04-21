@@ -1,7 +1,9 @@
-import { hash } from "bcrypt";
+import { compare, hash } from "bcrypt";
 
 import User from "../models/users/User.js";
 import UsersRepository from "../models/users/UsersRepository.js";
+import jwt from 'jsonwebtoken';
+const { sign } = jwt;
 
 const usersRepository = new UsersRepository();
 
@@ -59,26 +61,26 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-  const { name, email, password } = req.body;
+    const { name, email, password } = req.body;
 
-  const userById = await usersRepository.getUserById(id);
-  const userByEmail = await usersRepository.getUserByEmail(email);
+    const userById = await usersRepository.getUserById(id);
+    const userByEmail = await usersRepository.getUserByEmail(email);
 
-  if (!userById) {
-    return res.status(404).send({ message: "Usuário não encontrado" });
-  }
+    if (!userById) {
+      return res.status(404).send({ message: "Usuário não encontrado" });
+    }
 
-  if (userByEmail && userByEmail.id !== id) {
-    return res.status(409).send({ message: "Email já cadastrado" });
-  }
+    if (userByEmail && userByEmail.id !== id) {
+      return res.status(409).send({ message: "Email já cadastrado" });
+    }
 
-  const passwordHash = await hash(password, 8);
+    const passwordHash = await hash(password, 8);
 
-  const user = await usersRepository.updateUser(id, name, email, passwordHash);
+    const user = await usersRepository.updateUser(id, name, email, passwordHash);
 
-  return res
-    .status(200)
-    .send({ message: "Usuário atualizado com sucesso", user });
+    return res
+      .status(200)
+      .send({ message: "Usuário atualizado com sucesso", user });
   } catch (error) {
     return res.status(500).send({ message: "Erro ao atualizar usuário", error: error.message });
   }
@@ -88,18 +90,45 @@ export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
 
-  const user = await usersRepository.getUserById(id);
+    const user = await usersRepository.getUserById(id);
 
-  if (!user) {
-    return res.status(404).send({ message: "Usuário não encontrado" });
-  }
+    if (!user) {
+      return res.status(404).send({ message: "Usuário não encontrado" });
+    }
 
-  await usersRepository.deleteUser(id);
+    await usersRepository.deleteUser(id);
 
-  return res
-    .status(200)
-    .send({ message: "Usuário deletado com sucesso", user });
+    return res
+      .status(200)
+      .send({ message: "Usuário deletado com sucesso", user });
   } catch (error) {
     return res.status(500).send({ message: "Erro ao deletar usuário", error: error.message });
+  }
+};
+
+export const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await usersRepository.getUserByEmail(email);
+
+    if (!user) {
+      return res.status(404).send({ message: "Usuário não encontrado" });
+    }
+
+    const passwordMatch = await compare(password, user.password);
+
+    if (!passwordMatch) {
+      console.log(password, user.password);
+      return res.status(401).send({ message: "Email ou senha inválidos" });
+    }
+
+    const token = sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+
+    return res.status(200).send({ message: "Login realizado com sucesso", token });
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao realizar login", error: error.message });
   }
 };

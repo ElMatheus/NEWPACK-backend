@@ -1,10 +1,12 @@
 import pgp from "pg-promise";
 import { config } from "dotenv";
 
-import path, {join} from "path";
+import path, { join } from "path";
 import { fileURLToPath } from "url";
 
-config(); 
+config();
+
+
 
 const user = process.env.DB_USER;
 const password = process.env.DB_PASSWORD;
