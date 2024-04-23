@@ -41,16 +41,16 @@ export default class UsersRepository {
     try {
       const user = this.getUserById(id);
 
-    if (!user) {
-      return null;
-    }
+      if (!user) {
+        return null;
+      }
 
-    const updateUser = await this.pg.oneOrNone(
-      "UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4 RETURNING *",
-      [name, email, password, id]
-    );
+      const updateUser = await this.pg.oneOrNone(
+        "UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4 RETURNING *",
+        [name, email, password, id]
+      );
 
-    return updateUser;
+      return updateUser;
     } catch (error) {
       throw error;
     }
@@ -59,6 +59,15 @@ export default class UsersRepository {
   async getUserByEmail(email) {
     try {
       const user = await this.pg.oneOrNone("SELECT * FROM users WHERE email = $1", email);
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getUserByName(name) {
+    try {
+      const user = await this.pg.oneOrNone("SELECT * FROM users WHERE name = $1", name);
       return user;
     } catch (error) {
       throw error;

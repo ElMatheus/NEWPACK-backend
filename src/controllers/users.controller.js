@@ -108,9 +108,9 @@ export const deleteUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { name, password } = req.body;
 
-    const user = await usersRepository.getUserByEmail(email);
+    const user = await usersRepository.getUserByName(name);
 
     if (!user) {
       return res.status(404).send({ message: "Usuário não encontrado" });
@@ -119,14 +119,10 @@ export const loginUser = async (req, res) => {
     const passwordMatch = await compare(password, user.password);
 
     if (!passwordMatch) {
-      return res.status(401).send({ message: "Email ou senha inválidos" });
+      return res.status(401).send({ message: "Nome ou senha inválidos" });
     }
 
-    const token = sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
-
-    return res.status(200).send({ message: "Login realizado com sucesso", token });
+    return res.status(200).send({ message: "Login realizado com sucesso", token: jwt.sign(user, 'PRIVATEKEY') });
   } catch (error) {
     return res.status(500).send({ message: "Erro ao realizar login", error: error.message });
   }
