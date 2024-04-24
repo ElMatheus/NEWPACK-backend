@@ -122,7 +122,7 @@ export const loginUser = async (req, res) => {
       return res.status(401).send({ message: "Nome ou senha inválidos" });
     }
 
-    return res.status(200).send({ message: "Login realizado com sucesso", token: jwt.sign(user, 'PRIVATEKEY') });
+    return res.status(200).send({ user, token: jwt.sign(user, 'PRIVATEKEY') });
   } catch (error) {
     return res.status(500).send({ message: "Erro ao realizar login", error: error.message });
   }
