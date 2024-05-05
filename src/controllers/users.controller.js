@@ -2,10 +2,13 @@ import { compare, hash } from "bcrypt";
 
 import User from "../models/users/User.js";
 import UsersRepository from "../models/users/UsersRepository.js";
+import RefreshRepository from "../models/refreshToken/RefreshRepository.js";
 import jwt from 'jsonwebtoken';
+import Refresh from "../models/refreshToken/Refresh.js";
 const { sign } = jwt;
 
 const usersRepository = new UsersRepository();
+const refreshRepository = new RefreshRepository();
 
 export const getUsers = async (req, res) => {
   try {
@@ -106,6 +109,7 @@ export const deleteUser = async (req, res) => {
   }
 };
 
+
 export const loginUser = async (req, res) => {
   try {
     const { name, password } = req.body;
@@ -122,8 +126,37 @@ export const loginUser = async (req, res) => {
       return res.status(401).send({ message: "Nome ou senha inválidos" });
     }
 
-    return res.status(200).send({ user, token: jwt.sign(user, 'PRIVATEKEY') });
+    const token = sign({}, 'ca94e53c-e4e7-422a-9558-f32670cce6a5', {
+      subject: user.id,
+      expiresIn: '20s'
+    });
+
+    const generateRefreshToken = new Refresh(user.id);
+    const refreshToken = await refreshRepository.createRefreshToken(generateRefreshToken);
+
+    return res.status(200).send({ user, token: token, refreshToken });
   } catch (error) {
     return res.status(500).send({ message: "Erro ao realizar login", error: error.message });
   }
 };
+
+export const refresh = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+
+    const token = await refreshRepository.getRefreshToken(refreshToken);
+
+    if (!token) {
+      return res.status(404).send({ message: "Token inválido ou expirado" });
+    }
+
+    const newToken = sign({}, 'ca94e53c-e4e7-422a-9558-f32670cce6a5', {
+      subject: token.user_id,
+      expiresIn: '20s'
+    });
+
+    return res.status(200).send({ token: newToken });
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao realizar refresh", error: error.message });
+  }
+}

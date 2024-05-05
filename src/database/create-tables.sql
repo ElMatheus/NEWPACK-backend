@@ -4,3 +4,10 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS refresh_token (
+    id VARCHAR(36) PRIMARY KEY,
+    expiresIn INT NOT NULL,
+    user_id VARCHAR(36) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);

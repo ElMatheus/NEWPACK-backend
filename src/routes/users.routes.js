@@ -6,17 +6,22 @@ import {
   createUser,
   updateUser,
   deleteUser,
-  loginUser
+  loginUser,
+  refresh
+
 } from "../controllers/users.controller.js";
+import { ensureAuthenticated } from "../middlewares/ensureAuthenticated.js";
 
 const usersRouter = Router();
 
-usersRouter.get("/", getUsers);
+usersRouter.get("/", ensureAuthenticated, getUsers);
 usersRouter.get("/:id", getUserById);
 usersRouter.post("/", createUser);
 usersRouter.put("/:id", updateUser);
 usersRouter.delete("/:id", deleteUser);
 usersRouter.post("/login", loginUser);
+usersRouter.post("/refresh", refresh);
+
 
 
 
