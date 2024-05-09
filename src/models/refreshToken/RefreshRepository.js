@@ -24,10 +24,11 @@ export default class RefreshRepository {
       const token = await this.pg.oneOrNone("SELECT * FROM refresh_token WHERE id = $1", refreshToken);
 
       if (!token) {
+        console.log("token nao encontrado");
         return null;
       };
-
-      const refreshTokenExpired = dayjs().isAfter(dayjs.unix(token.expiresIn));
+      const now = dayjs().unix();
+      const refreshTokenExpired = now > token.expiresin;
 
       if (refreshTokenExpired) {
         await this.pg.none("DELETE FROM refresh_token WHERE id = $1", refreshToken);

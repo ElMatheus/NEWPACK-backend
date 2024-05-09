@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import dayjs from "dayjs";
-const expiresIn = dayjs().add(15, "second").unix();
+const expiresIn = dayjs().add(50, "second").unix();
 
 export default class Refresh {
   constructor(userId) {
