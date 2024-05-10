@@ -155,7 +155,7 @@ export const refresh = async (req, res) => {
       expiresIn: '10m'
     });
 
-    return res.status(200).send({ token: newToken });
+    return res.status(200).send({ token: newToken, user_id: token.user_id });
   } catch (error) {
     return res.status(500).send({ message: "Erro ao realizar refresh", error: error.message });
   }

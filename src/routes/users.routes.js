@@ -15,7 +15,7 @@ import { ensureAuthenticated } from "../middlewares/ensureAuthenticated.js";
 const usersRouter = Router();
 
 usersRouter.get("/", ensureAuthenticated, getUsers);
-usersRouter.get("/:id", getUserById);
+usersRouter.get("/:id", ensureAuthenticated, getUserById);
 usersRouter.post("/", createUser);
 usersRouter.put("/:id", updateUser);
 usersRouter.delete("/:id", deleteUser);
