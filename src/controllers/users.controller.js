@@ -128,7 +128,7 @@ export const loginUser = async (req, res) => {
 
     const token = sign({}, 'ca94e53c-e4e7-422a-9558-f32670cce6a5', {
       subject: user.id,
-      expiresIn: '10m'
+      expiresIn: '15m'
     });
 
     const generateRefreshToken = new Refresh(user.id);
@@ -152,7 +152,7 @@ export const refresh = async (req, res) => {
 
     const newToken = sign({}, 'ca94e53c-e4e7-422a-9558-f32670cce6a5', {
       subject: token.user_id,
-      expiresIn: '10m'
+      expiresIn: '15m'
     });
 
     return res.status(200).send({ token: newToken, user_id: token.user_id });

@@ -34,7 +34,7 @@ export default class RefreshRepository {
         await this.pg.none("DELETE FROM refresh_token WHERE id = $1", refreshToken);
         return null;
       } else {
-        await this.pg.none("UPDATE refresh_token SET expiresIn = $1 WHERE id = $2", [dayjs().add(5, "day").unix(), refreshToken]);
+        await this.pg.none("UPDATE refresh_token SET expiresIn = $1 WHERE id = $2", [dayjs().add(30, "day").unix(), refreshToken]);
         return token;
       }
 
