@@ -5,6 +5,8 @@ import UsersRepository from "../models/users/UsersRepository.js";
 import RefreshRepository from "../models/refreshToken/RefreshRepository.js";
 import jwt from 'jsonwebtoken';
 import Refresh from "../models/refreshToken/Refresh.js";
+import validateCnpj from "../helpers/validateCnpj.js";
+import formatCnpj from "../helpers/formatCnpj.js";
 const { sign } = jwt;
 
 const usersRepository = new UsersRepository();
@@ -41,17 +43,21 @@ export const getUserById = async (req, res) => {
 
 export const createUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, cnpj, password } = req.body;
 
-    const userAlreadyExists = await usersRepository.getUserByEmail(email);
+    const userAlreadyExists = await usersRepository.getUserByCnpj(cnpj);
 
     if (userAlreadyExists) {
       return res.status(409).send({ message: "Usuário já cadastrado" });
     }
 
+    if (!validateCnpj(cnpj)) {
+      return res.status(400).send({ message: "Cnpj inválido" });
+    }
+
     const passwordHash = await hash(password, 8);
 
-    const user = new User(name, email, passwordHash);
+    const user = new User(name, formatCnpj(cnpj), passwordHash);
 
     await usersRepository.createUser(user);
 
@@ -64,22 +70,22 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email, password } = req.body;
+    const { name, cnpj, password } = req.body;
 
     const userById = await usersRepository.getUserById(id);
-    const userByEmail = await usersRepository.getUserByEmail(email);
+    const userByCnpj = await usersRepository.getUserByCnpj(cnpj);
 
     if (!userById) {
       return res.status(404).send({ message: "Usuário não encontrado" });
     }
 
-    if (userByEmail && userByEmail.id !== id) {
-      return res.status(409).send({ message: "Email já cadastrado" });
+    if (userByCnpj && userByCnpj.id !== id) {
+      return res.status(409).send({ message: "Cnpj já cadastrado" });
     }
 
     const passwordHash = await hash(password, 8);
 
-    const user = await usersRepository.updateUser(id, name, email, passwordHash);
+    const user = await usersRepository.updateUser(id, name, cnpj, passwordHash);
 
     return res
       .status(200)

@@ -7,7 +7,6 @@ export default class UsersRepository {
   async getUsers() {
     try {
       const allUsers = await this.pg.manyOrNone("SELECT * FROM users");
-      console.log(allUsers);
       return allUsers;
     } catch (error) {
       throw error;
@@ -17,7 +16,6 @@ export default class UsersRepository {
   async getUserById(id) {
     try {
       const user = await this.pg.oneOrNone("SELECT * FROM users WHERE id = $1", id);
-      console.log(user);
       return user;
     } catch (error) {
       throw error;
@@ -26,10 +24,10 @@ export default class UsersRepository {
 
   async createUser(user) {
     try {
-      await this.pg.none("INSERT INTO users (id, name, email, password) VALUES ($1, $2, $3, $4)", [
+      await this.pg.none("INSERT INTO users (id, name, cnpj, password) VALUES ($1, $2, $3, $4)", [
         user.id,
         user.name,
-        user.email,
+        user.cnpj,
         user.password
       ]);
       return user;
@@ -37,7 +35,7 @@ export default class UsersRepository {
       throw error;
     }
   }
-  async updateUser(id, name, email, password) {
+  async updateUser(id, name, cnpj, password) {
     try {
       const user = this.getUserById(id);
 
@@ -46,8 +44,8 @@ export default class UsersRepository {
       }
 
       const updateUser = await this.pg.oneOrNone(
-        "UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4 RETURNING *",
-        [name, email, password, id]
+        "UPDATE users SET name = $1, cnpj = $2, password = $3 WHERE id = $4 RETURNING *",
+        [name, cnpj, password, id]
       );
 
       return updateUser;
@@ -56,9 +54,9 @@ export default class UsersRepository {
     }
   }
 
-  async getUserByEmail(email) {
+  async getUserByCnpj(cnpj) {
     try {
-      const user = await this.pg.oneOrNone("SELECT * FROM users WHERE email = $1", email);
+      const user = await this.pg.oneOrNone("SELECT * FROM users WHERE cnpj = $1", cnpj);
       return user;
     } catch (error) {
       throw error;
