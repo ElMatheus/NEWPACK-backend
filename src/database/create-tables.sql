@@ -13,12 +13,37 @@ CREATE TABLE IF NOT EXISTS refresh_token (
 );
 
 CREATE TABLE IF NOT EXISTS products (
-    id SERIAL PRIMARY KEY,
+    id INT PRIMARY KEY NOT NULL,
     name VARCHAR(255) NOT NULL,
-    image VARCHAR(255) NOT NULL,
-    price DECIMAL(10, 2) NOT NULL,
-    quantity INT NOT NULL,
     toughness VARCHAR(140) NOT NULL,
     dimension VARCHAR(140) NOT NULL,
-    description TEXT NOT NULL
+    description TEXT NOT NULL,
+    unitary_value DECIMAL(10, 2) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS product_images (
+    id SERIAL PRIMARY KEY,
+    product_id INT NOT NULL,
+    image_url TEXT NOT NULL,
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+
+CREATE TABLE IF NOT EXISTS orders (
+    id SERIAL PRIMARY KEY,
+    client_id VARCHAR(36) NOT NULL,
+    order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(50) NOT NULL,
+    FOREIGN KEY (client_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS order_details (
+    id SERIAL PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    quantity INT NOT NULL,
+    unitary_price DECIMAL(10, 2) NOT NULL,
+    full_price DECIMAL(10, 2) GENERATED ALWAYS AS (quantity * unitary_price) STORED,
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
 );
