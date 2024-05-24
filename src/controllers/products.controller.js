@@ -1,4 +1,3 @@
-import e from "express";
 import Product from "../models/products/Product.js";
 import ProductsRepository from "../models/products/ProductsRepository.js";
 const productsRepository = new ProductsRepository();
@@ -34,9 +33,9 @@ export const getProductById = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
-    const { name, image, price, quantity, toughness, dimension, description } = req.body;
+    const { id, name, toughness, dimension, description, unitary_value } = req.body;
 
-    const newProduct = new Product(name, image, price, quantity, toughness, dimension, description);
+    const newProduct = new Product(id, name, toughness, dimension, description, unitary_value);
 
     await productsRepository.createProduct(newProduct);
 
@@ -62,5 +61,24 @@ export const deleteProduct = async (req, res) => {
   }
   catch (error) {
     return res.status(500).send({ message: "Erro ao deletar produto", error: error.message });
+  }
+}
+
+export const addImageOnProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { image } = req.body;
+
+    const product = await productsRepository.getProductById(id);
+
+    if (!product) {
+      return res.status(404).send({ message: "Produto não encontrado" });
+    }
+
+    await productsRepository.addImageOnProduct(id, image);
+
+    return res.status(200).send({ message: "Imagem adicionada com sucesso" });
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao adicionar imagem", error: error.message });
   }
 }
