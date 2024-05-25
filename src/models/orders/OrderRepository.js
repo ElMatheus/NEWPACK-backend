@@ -6,7 +6,7 @@ export default class ProductsRepository {
 
   async getOrders() {
     try {
-      const allOrders = await this.pg.manyOrNone("SELECT orders.id AS order_id, orders.client_id, users.name AS client_name, orders.order_date, orders.status, order_details.product_id, products.name AS product_name, order_details.quantity, order_details.full_price FROM orders INNER JOIN users ON orders.client_id = users.id INNER JOIN order_details ON orders.id = order_details.order_id INNER JOIN products ON order_details.product_id = products.id");
+      const allOrders = await this.pg.manyOrNone("SELECT order_details.id AS order_id, orders.client_id, users.name AS client_name, orders.order_date, orders.status, order_details.product_id, products.name AS product_name, order_details.quantity, order_details.unitary_price,order_details.full_price FROM orders INNER JOIN users ON orders.client_id = users.id INNER JOIN order_details ON orders.id = order_details.order_id INNER JOIN products ON order_details.product_id = products.id");
       return allOrders;
     } catch (error) {
       throw error;
