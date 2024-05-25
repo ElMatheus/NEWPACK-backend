@@ -54,6 +54,65 @@ export const createOrder = async (req, res) => {
   }
 }
 
+export const updateOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { client_id, order_date, status } = req.body;
+    const userAlreadyExists = await usersRepository.getUserById(client_id);
+
+    if (!userAlreadyExists) {
+      return res.status(404).send({ message: "Usuário não encontrado" });
+    }
+
+    const orderAlreadyExists = await ordersRepository.getOrderById(id);
+
+    if (!orderAlreadyExists) {
+      return res.status(404).send({ message: "Pedido não encontrado" });
+    }
+
+    const updatedOrder = await ordersRepository.updateOrder(id, client_id, order_date, status);
+
+    return res.status(200).send({ message: "Pedido atualizado com sucesso", updatedOrder });
+
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao atualizar pedido", error: error.message });
+  }
+}
+
+export const deleteOrder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const orderAlreadyExists = await ordersRepository.getOrderById(id);
+
+    if (!orderAlreadyExists) {
+      return res.status(404).send({ message: "Pedido não encontrado" });
+    }
+
+    await ordersRepository.deleteOrder(id);
+
+    return res.status(200).send({ message: "Pedido excluído com sucesso" });
+
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao excluir pedido", error: error.message });
+  }
+}
+
+export const getOrderDetailById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const orderDetail = await ordersRepository.getOrderDetailById(id);
+
+    if (!orderDetail) {
+      return res.status(404).send({ message: "Detalhe do pedido não encontrado" });
+    }
+
+    return res.status(200).send({ message: "Detalhe do pedido encontrado", orderDetail });
+
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao buscar detalhes do pedido", error: error.message });
+  }
+}
+
 export const createOrderDetail = async (req, res) => {
   try {
     const { order_id, product_id, quantity } = req.body;
@@ -69,15 +128,33 @@ export const createOrderDetail = async (req, res) => {
       return res.status(404).send({ message: "Produto não encontrado" });
     }
 
-    console.log(productAlreadyExists);
-
     const newOrderDetail = new OrderDetail(order_id, product_id, quantity, productAlreadyExists.unitary_value);
 
     await ordersRepository.createOrderDetail(newOrderDetail);
+
+    await ordersRepository.updateOrder(order_id, orderAlreadyExists.client_id, orderAlreadyExists.order_date, "Pendente");
 
     return res.status(201).send({ message: "Detalhe do pedido criado com sucesso", newOrderDetail });
 
   } catch (error) {
     return res.status(500).send({ message: "Erro ao criar detalhe do pedido", error: error.message });
+  }
+}
+
+export const deleteOrderDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const orderDetailAlreadyExists = await ordersRepository.getOrderDetailById(id);
+
+    if (!orderDetailAlreadyExists) {
+      return res.status(404).send({ message: "Detalhe do pedido não encontrado" });
+    }
+
+    await ordersRepository.deleteOrderDetail(id);
+
+    return res.status(200).send({ message: "Detalhe do pedido excluído com sucesso" });
+
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao excluir detalhe do pedido", error: error.message });
   }
 }

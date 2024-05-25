@@ -6,7 +6,7 @@ export default class ProductsRepository {
 
   async getOrders() {
     try {
-      const allOrders = await this.pg.manyOrNone("SELECT order_details.id AS order_id, orders.client_id, users.name AS client_name, orders.order_date, orders.status, order_details.product_id, products.name AS product_name, order_details.quantity, order_details.unitary_price,order_details.full_price FROM orders INNER JOIN users ON orders.client_id = users.id INNER JOIN order_details ON orders.id = order_details.order_id INNER JOIN products ON order_details.product_id = products.id");
+      const allOrders = await this.pg.manyOrNone("SELECT order_details.id AS orderDetail_id, orders.id AS order_id, orders.client_id, users.name AS client_name, orders.order_date, orders.status, order_details.product_id, products.name AS product_name, order_details.quantity, order_details.unitary_price,order_details.full_price FROM orders INNER JOIN users ON orders.client_id = users.id LEFT JOIN order_details ON orders.id = order_details.order_id LEFT JOIN products ON order_details.product_id = products.id");
       return allOrders;
     } catch (error) {
       throw error;
@@ -34,6 +34,36 @@ export default class ProductsRepository {
     }
   }
 
+  async updateOrder(id, client_id, order_date, status) {
+    try {
+      const updateUser = await this.pg.oneOrNone(
+        "UPDATE orders SET client_id = $1, order_date = $2, status = $3 WHERE id = $4 RETURNING *",
+        [client_id, order_date, status, id]
+      );
+
+      return updateUser;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async deleteOrder(id) {
+    try {
+      await this.pg.none("DELETE FROM orders WHERE id = $1", [id]);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getOrderDetailById(id) {
+    try {
+      const orderDetail = await this.pg.oneOrNone("SELECT * FROM order_details WHERE id = $1", [id]);
+      return orderDetail;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async createOrderDetail(orderDetail) {
     try {
       const newOrderDetail = await this.pg.one(
@@ -46,19 +76,11 @@ export default class ProductsRepository {
     }
   }
 
-  //   async deleteProduct(id) {
-  //     try {
-  //       await this.pg.none("DELETE FROM products WHERE id = $1", [id]);
-  //     } catch (error) {
-  //       throw error;
-  //     }
-  //   }
-
-  //   async addImageOnProduct(id, image) {
-  //     try {
-  //       await this.pg.none("INSERT INTO product_images (product_id, image_url) VALUES ($1,$2)", [id, image]);
-  //     } catch (error) {
-  //       throw error;
-  //     }
-  //   }
+  async deleteOrderDetail(id) {
+    try {
+      await this.pg.none("DELETE FROM order_details WHERE id = $1", [id]);
+    } catch (error) {
+      throw error;
+    }
+  }
 }
