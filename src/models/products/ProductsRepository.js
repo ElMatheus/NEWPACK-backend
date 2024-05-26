@@ -6,21 +6,21 @@ export default class ProductsRepository {
 
   async getProducts() {
     try {
-      const allProducts = await this.pg.manyOrNone("SELECT products.id, products.name, products.toughness, products.dimension, products.description, products.unitary_value, product_images.image_url FROM products LEFT JOIN product_images ON products.id = product_images.product_id ORDER BY products.id");
+      const allProducts = await this.pg.manyOrNone("SELECT products.id, products.name, products.toughness, products.dimension, products.description, products.unitary_value, array_agg(product_images.image_url) AS images FROM products LEFT JOIN product_images ON products.id = product_images.product_id GROUP BY products.id");
       return allProducts;
     } catch (error) {
       throw error;
     }
-  }
+  };
 
   async getProductById(id) {
     try {
-      const product = await this.pg.oneOrNone("SELECT * FROM products WHERE id = $1", [id]);
+      const product = await this.pg.oneOrNone("SELECT products.id, products.name, products.toughness, products.dimension, products.description, products.unitary_value, array_agg(product_images.image_url) AS images FROM products LEFT JOIN product_images ON products.id = product_images.product_id WHERE products.id = $1 GROUP BY products.id", [id]);
       return product;
     } catch (error) {
       throw error;
     }
-  }
+  };
 
   async createProduct(product) {
     try {
@@ -32,6 +32,18 @@ export default class ProductsRepository {
     } catch (error) {
       throw error;
     }
+  };
+
+  async updateProduct(name, toughness, dimension, description, unitary_value, id) {
+    try {
+      const updatedProduct = await this.pg.one(
+        "UPDATE products SET name = $1, toughness = $2, dimension = $3, description = $4, unitary_value = $5 WHERE id = $6 RETURNING *",
+        [name, toughness, dimension, description, unitary_value, id]
+      );
+      return updatedProduct;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async deleteProduct(id) {
@@ -40,7 +52,7 @@ export default class ProductsRepository {
     } catch (error) {
       throw error;
     }
-  }
+  };
 
   async addImageOnProduct(id, image) {
     try {
@@ -48,5 +60,26 @@ export default class ProductsRepository {
     } catch (error) {
       throw error;
     }
+  };
+
+  async deleteProductImage(productId, imageUrl) {
+    try {
+      await this.pg.none("DELETE FROM product_images WHERE product_id = $1 AND image_url = $2", [productId, imageUrl]);
+    } catch (error) {
+      throw error;
+    }
   }
-}
+
+  async updateProductImage(productId, oldImageUrl, newImageUrl) {
+    try {
+      const updatedImage = await this.pg.one(
+        "UPDATE product_images SET image_url = $1 WHERE product_id = $2 AND image_url = $3 RETURNING *",
+        [newImageUrl, productId, oldImageUrl]
+      );
+      return updatedImage;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+};

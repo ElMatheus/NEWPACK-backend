@@ -13,7 +13,7 @@ export const getProducts = async (req, res) => {
   } catch (error) {
     return res.status(500).send({ message: "Erro ao buscar produtos", error: error.message });
   }
-}
+};
 
 export const getProductById = async (req, res) => {
   try {
@@ -45,6 +45,26 @@ export const createProduct = async (req, res) => {
   }
 };
 
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, toughness, dimension, description, unitary_value } = req.body;
+
+    const product = await productsRepository.getProductById(id);
+
+    if (!product) {
+      return res.status(404).send({ message: "Produto não encontrado" });
+    }
+
+    const updatedProduct = await productsRepository.updateProduct(name, toughness, dimension, description, unitary_value, id);
+
+    return res.status(200).send({ message: "Produto atualizado com sucesso", updatedProduct });
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao atualizar produto", error: error.message });
+  }
+};
+
+
 export const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
@@ -62,7 +82,7 @@ export const deleteProduct = async (req, res) => {
   catch (error) {
     return res.status(500).send({ message: "Erro ao deletar produto", error: error.message });
   }
-}
+};
 
 export const addImageOnProduct = async (req, res) => {
   try {
@@ -81,4 +101,44 @@ export const addImageOnProduct = async (req, res) => {
   } catch (error) {
     return res.status(500).send({ message: "Erro ao adicionar imagem", error: error.message });
   }
-}
+};
+
+export const deleteProductImage = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const { imageUrl } = req.body;
+
+    console.log(productId);
+
+    const product = await productsRepository.getProductById(productId);
+
+    if (!product) {
+      return res.status(404).send({ message: "Produto não encontrado" });
+    }
+
+    await productsRepository.deleteProductImage(productId, imageUrl);
+
+    return res.status(200).send({ message: "Imagem deletada com sucesso" });
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao deletar imagem", error: error.message });
+  }
+};
+
+export const updateProductImage = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const { oldImageUrl, newImageUrl } = req.body;
+
+    const product = await productsRepository.getProductById(productId);
+
+    if (!product) {
+      return res.status(404).send({ message: "Produto não encontrado" });
+    }
+
+    await productsRepository.updateProductImage(productId, oldImageUrl, newImageUrl);
+
+    return res.status(200).send({ message: "Imagem atualizada com sucesso" });
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao atualizar imagem", error: error.message });
+  }
+};
