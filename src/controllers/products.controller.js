@@ -31,6 +31,22 @@ export const getProductById = async (req, res) => {
   }
 };
 
+export const getProductByImage = async (req, res) => {
+  try {
+    const { image } = req.params;
+    const product = await productsRepository.getProductByImage(image);
+
+    if (!product) {
+      return res.status(404).send({ message: "Produto não encontrado" });
+    }
+
+    return res.status(200).send({ message: "Produto encontrado", product });
+
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao buscar produto", error: error.message });
+  }
+}
+
 export const createProduct = async (req, res) => {
   try {
     const { id, name, toughness, dimension, description, unitary_value } = req.body;
@@ -108,12 +124,15 @@ export const deleteProductImage = async (req, res) => {
     const { productId } = req.params;
     const { imageUrl } = req.body;
 
-    console.log(productId);
-
     const product = await productsRepository.getProductById(productId);
+    const productImage = await productsRepository.getProductByImageAndProductId(imageUrl, productId);
 
     if (!product) {
       return res.status(404).send({ message: "Produto não encontrado" });
+    }
+
+    if (!productImage) {
+      return res.status(404).send({ message: "Imagem não encontrada" });
     }
 
     await productsRepository.deleteProductImage(productId, imageUrl);
@@ -130,9 +149,14 @@ export const updateProductImage = async (req, res) => {
     const { oldImageUrl, newImageUrl } = req.body;
 
     const product = await productsRepository.getProductById(productId);
+    const productImage = await productsRepository.getProductByImageAndProductId(oldImageUrl, productId);
 
     if (!product) {
       return res.status(404).send({ message: "Produto não encontrado" });
+    }
+
+    if (!productImage) {
+      return res.status(404).send({ message: "Imagem não encontrada" });
     }
 
     await productsRepository.updateProductImage(productId, oldImageUrl, newImageUrl);

@@ -22,6 +22,24 @@ export default class ProductsRepository {
     }
   };
 
+  async getProductByImage(image) {
+    try {
+      const product = await this.pg.oneOrNone("SELECT * FROM products INNER JOIN product_images ON products.id = product_images.product_id WHERE product_images.image_url = $1", [image]);
+      return product;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  async getProductByImageAndProductId(image, productId) {
+    try {
+      const product = await this.pg.oneOrNone("SELECT * FROM products INNER JOIN product_images ON products.id = product_images.product_id WHERE product_images.image_url = $1 AND products.id = $2", [image, productId]);
+      return product;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   async createProduct(product) {
     try {
       const newProduct = await this.pg.one(
@@ -81,5 +99,4 @@ export default class ProductsRepository {
       throw error;
     }
   }
-
 };
