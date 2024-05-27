@@ -76,9 +76,34 @@ export default class ProductsRepository {
     }
   }
 
+  async updateOrderDetail(id, order_id, product_id, quantity, unitary_price) {
+    try {
+      const updateOrderDetail = await this.pg.oneOrNone(
+        "UPDATE order_details SET order_id = $1, product_id = $2, quantity = $3, unitary_price = $4 WHERE id = $5 RETURNING *",
+        [order_id, product_id, quantity, unitary_price, id]
+      );
+
+      return updateOrderDetail;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async deleteOrderDetail(id) {
     try {
       await this.pg.none("DELETE FROM order_details WHERE id = $1", [id]);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getProductInOrder(order_id, product_id) {
+    try {
+      const productInOrder = await this.pg.oneOrNone(
+        "SELECT * FROM order_details WHERE order_id = $1 AND product_id = $2",
+        [order_id, product_id]
+      );
+      return productInOrder;
     } catch (error) {
       throw error;
     }

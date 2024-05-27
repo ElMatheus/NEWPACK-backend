@@ -128,6 +128,14 @@ export const createOrderDetail = async (req, res) => {
       return res.status(404).send({ message: "Produto não encontrado" });
     }
 
+    const productAlreadyExistsInOrder = await ordersRepository.getProductInOrder(order_id, product_id);
+
+    if (productAlreadyExistsInOrder) {
+      productAlreadyExistsInOrder.quantity += Number(quantity);
+      const updateProductInOrder = await ordersRepository.updateOrderDetail(productAlreadyExistsInOrder.id, productAlreadyExistsInOrder.order_id, productAlreadyExistsInOrder.product_id, productAlreadyExistsInOrder.quantity, productAlreadyExistsInOrder.unitary_price);
+      return res.status(200).send({ message: "Já existe este produto neste pedido, pedido atualizado", updateProductInOrder });
+    }
+
     const newOrderDetail = new OrderDetail(order_id, product_id, quantity, productAlreadyExists.unitary_value);
 
     await ordersRepository.createOrderDetail(newOrderDetail);
