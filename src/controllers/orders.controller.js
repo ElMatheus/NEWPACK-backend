@@ -149,6 +149,37 @@ export const createOrderDetail = async (req, res) => {
   }
 }
 
+export const updateOrderDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { order_id, product_id, quantity, unitary_price } = req.body;
+    const orderAlreadyExists = await ordersRepository.getOrderById(order_id);
+
+    if (!orderAlreadyExists) {
+      return res.status(404).send({ message: "Pedido não encontrado" });
+    }
+
+    const productAlreadyExists = await productsRepository.getProductById(product_id);
+
+    if (!productAlreadyExists) {
+      return res.status(404).send({ message: "Produto não encontrado" });
+    }
+
+    const orderDetailAlreadyExists = await ordersRepository.getOrderDetailById(id);
+
+    if (!orderDetailAlreadyExists) {
+      return res.status(404).send({ message: "Detalhe do pedido não encontrado" });
+    }
+
+    const updatedOrderDetail = await ordersRepository.updateOrderDetail(id, order_id, product_id, quantity, unitary_price);
+
+    return res.status(200).send({ message: "Detalhe do pedido atualizado com sucesso", updatedOrderDetail });
+
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao atualizar detalhe do pedido", error: error.message });
+  }
+}
+
 export const deleteOrderDetail = async (req, res) => {
   try {
     const { id } = req.params;
