@@ -197,3 +197,24 @@ export const deleteOrderDetail = async (req, res) => {
     return res.status(500).send({ message: "Erro ao excluir detalhe do pedido", error: error.message });
   }
 }
+
+export const getOrderByName = async (req, res) => {
+  try {
+    const { name } = req.params;
+    const userAlreadyExists = await usersRepository.getUserByName(name);
+
+    if (!userAlreadyExists) {
+      return res.status(404).send({ message: "Usuário não encontrado" });
+    }
+
+    const allOrders = await ordersRepository.getOrdersByName(name);
+
+    if (allOrders.length === 0) {
+      return res.status(404).send({ message: "Este usuário não possui pedidos ainda" });
+    }
+
+    return res.status(200).send(allOrders);
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao buscar todos os pedidos por nome de usuario", error: error.message });
+  }
+}

@@ -41,6 +41,25 @@ export const getUserById = async (req, res) => {
   }
 };
 
+export const getUserByName = async (req, res) => {
+  try {
+    const { name } = req.params;
+
+    const user = await usersRepository.getUserByName(name);
+
+    if (!user) {
+      return res.status(404).send({ message: "Usuário não encontrado" });
+    }
+
+    return res.status(200).send({
+      message: "Usuário encontrado",
+      user
+    });
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao buscar usuário", error: error.message });
+  }
+};
+
 export const createUser = async (req, res) => {
   try {
     const { name, cnpj, password } = req.body;

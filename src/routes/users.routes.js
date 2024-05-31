@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
   getUsers,
   getUserById,
+  getUserByName,
   createUser,
   updateUser,
   deleteUser,
@@ -16,6 +17,7 @@ const usersRouter = Router();
 
 usersRouter.get("/", ensureAuthenticated, getUsers);
 usersRouter.get("/:id", ensureAuthenticated, getUserById);
+usersRouter.get("/name/:name", getUserByName);
 usersRouter.post("/", createUser);
 usersRouter.put("/:id", updateUser);
 usersRouter.delete("/:id", deleteUser);
