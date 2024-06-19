@@ -17,7 +17,9 @@ CREATE TABLE IF NOT EXISTS products (
     name VARCHAR(255) NOT NULL,
     toughness VARCHAR(140) NOT NULL,
     dimension VARCHAR(140) NOT NULL,
+    type VARCHAR(140) NOT NULL,
     description TEXT NOT NULL,
+    quantity_mts INT,
     unitary_value DECIMAL(10, 2) NOT NULL
 );
 

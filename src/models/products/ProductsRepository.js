@@ -6,7 +6,7 @@ export default class ProductsRepository {
 
   async getProducts() {
     try {
-      const allProducts = await this.pg.manyOrNone("SELECT products.id, products.name, products.toughness, products.dimension, products.description, products.unitary_value, array_agg(product_images.image_url) AS images FROM products LEFT JOIN product_images ON products.id = product_images.product_id GROUP BY products.id");
+      const allProducts = await this.pg.manyOrNone("SELECT products.id, products.name, products.toughness, products.dimension, products.type, products.description, products.quantity_mts,products.unitary_value, array_agg(product_images.image_url) AS images FROM products LEFT JOIN product_images ON products.id = product_images.product_id GROUP BY products.id");
       return allProducts;
     } catch (error) {
       throw error;
@@ -15,7 +15,7 @@ export default class ProductsRepository {
 
   async getProductById(id) {
     try {
-      const product = await this.pg.oneOrNone("SELECT products.id, products.name, products.toughness, products.dimension, products.description, products.unitary_value, array_agg(product_images.image_url) AS images FROM products LEFT JOIN product_images ON products.id = product_images.product_id WHERE products.id = $1 GROUP BY products.id", [id]);
+      const product = await this.pg.oneOrNone("SELECT products.id, products.name, products.toughness, products.dimension, products.type, products.description, products.quantity_mts,products.unitary_value, array_agg(product_images.image_url) AS images FROM products LEFT JOIN product_images ON products.id = product_images.product_id WHERE products.id = $1 GROUP BY products.id", [id]);
       return product;
     } catch (error) {
       throw error;
@@ -43,8 +43,8 @@ export default class ProductsRepository {
   async createProduct(product) {
     try {
       const newProduct = await this.pg.one(
-        "INSERT INTO products (id, name, toughness, dimension, description, unitary_value) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *",
-        [product.id, product.name, product.toughness, product.dimension, product.description, product.unitary_value]
+        "INSERT INTO products (id, name, toughness, dimension, type, description, quantity_mts, unitary_value) VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *",
+        [product.id, product.name, product.toughness, product.dimension, product.type, product.description, product.quantity_mts, product.unitary_value]
       );
       return newProduct;
     } catch (error) {
@@ -52,11 +52,11 @@ export default class ProductsRepository {
     }
   };
 
-  async updateProduct(name, toughness, dimension, description, unitary_value, id) {
+  async updateProduct(name, toughness, dimension, type, description, quantity_mts, unitary_value, id) {
     try {
       const updatedProduct = await this.pg.one(
-        "UPDATE products SET name = $1, toughness = $2, dimension = $3, description = $4, unitary_value = $5 WHERE id = $6 RETURNING *",
-        [name, toughness, dimension, description, unitary_value, id]
+        "UPDATE products SET name = $1, toughness = $2, dimension = $3, type = $4, description = $5, quantity_mts = $6 unitary_value = $7 WHERE id = $8 RETURNING *",
+        [name, toughness, dimension, type, description, quantity_mts, unitary_value, id]
       );
       return updatedProduct;
     } catch (error) {
