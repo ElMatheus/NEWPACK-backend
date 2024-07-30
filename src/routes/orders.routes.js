@@ -22,10 +22,11 @@ ordersRouter.post("/", createOrder);
 ordersRouter.put("/:id", updateOrder);
 ordersRouter.delete("/:id", deleteOrder);
 ordersRouter.get("/details/:id", getOrderDetailById);
-ordersRouter.post("/details", createOrderDetail);
+ordersRouter.post("/details", ensureAuthenticated, createOrderDetail);
 ordersRouter.put("/details/:id", updateOrderDetail);
 ordersRouter.delete("/details/:id", deleteOrderDetail);
-ordersRouter.get("/name/:name", ensureAuthenticated, getOrderByName);
+ordersRouter.get("/name/:name/:category?", ensureAuthenticated, getOrderByName);
+
 
 
 

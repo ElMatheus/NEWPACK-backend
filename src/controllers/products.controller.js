@@ -49,9 +49,9 @@ export const getProductByImage = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
-    const { id, name, toughness, dimension, type, description, quantity_mts, unitary_value } = req.body;
+    const { id, name, toughness, dimension, type, category, description, quantity_mts, unitary_value } = req.body;
 
-    const newProduct = new Product(id, name, toughness, dimension, type, description, quantity_mts, unitary_value);
+    const newProduct = new Product(id, name, toughness, dimension, type, category, description, quantity_mts, unitary_value);
 
     await productsRepository.createProduct(newProduct);
 
@@ -64,7 +64,7 @@ export const createProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, toughness, dimension, type, description, quantity_mts, unitary_value } = req.body;
+    const { name, toughness, dimension, type, category, description, quantity_mts, unitary_value } = req.body;
 
     const product = await productsRepository.getProductById(id);
 
@@ -72,7 +72,7 @@ export const updateProduct = async (req, res) => {
       return res.status(404).send({ message: "Produto não encontrado" });
     }
 
-    const updatedProduct = await productsRepository.updateProduct(name, toughness, dimension, type, description, quantity_mts, unitary_value, id);
+    const updatedProduct = await productsRepository.updateProduct(name, toughness, dimension, type, category, description, quantity_mts, unitary_value, id);
 
     return res.status(200).send({ message: "Produto atualizado com sucesso", updatedProduct });
   } catch (error) {
@@ -164,5 +164,21 @@ export const updateProductImage = async (req, res) => {
     return res.status(200).send({ message: "Imagem atualizada com sucesso" });
   } catch (error) {
     return res.status(500).send({ message: "Erro ao atualizar imagem", error: error.message });
+  }
+};
+
+export const getProductByCategory = async (req, res) => {
+  try {
+    const { category } = req.params;
+
+    const products = await productsRepository.getProductByCategory(category);
+
+    if (!products) {
+      return res.status(404).send({ message: "Não há produtos cadastrados nessa categoria" });
+    }
+
+    return res.status(200).send({ totalProducts: products.length, products });
+  } catch (error) {
+
   }
 };

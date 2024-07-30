@@ -62,12 +62,20 @@ export const getUserByName = async (req, res) => {
 
 export const createUser = async (req, res) => {
   try {
-    const { name, cnpj, password } = req.body;
+    const { name, cnpj, tel, password } = req.body;
 
-    const userAlreadyExists = await usersRepository.getUserByCnpj(cnpj);
+    const userAlreadyExistsCnpj = await usersRepository.getUserByCnpj(cnpj);
+    const userAlreadyExistsName = await usersRepository.getUserByName(name);
+    const userAlreadyExistsTel = await usersRepository.getUserByTel(tel);
 
-    if (userAlreadyExists) {
-      return res.status(409).send({ message: "Usuário já cadastrado" });
+    if (userAlreadyExistsCnpj) {
+      return res.status(409).send({ message: "Cnpj já cadastrado" });
+    }
+    if (userAlreadyExistsName) {
+      return res.status(409).send({ message: "Nome já cadastrado" });
+    }
+    if (userAlreadyExistsTel) {
+      return res.status(409).send({ message: "Telefone já cadastrado" });
     }
 
     if (!validateCnpj(cnpj)) {
@@ -76,7 +84,7 @@ export const createUser = async (req, res) => {
 
     const passwordHash = await hash(password, 8);
 
-    const user = new User(name, formatCnpj(cnpj), passwordHash);
+    const user = new User(name, formatCnpj(cnpj), tel, passwordHash);
 
     await usersRepository.createUser(user);
 
@@ -184,4 +192,96 @@ export const refresh = async (req, res) => {
   } catch (error) {
     return res.status(500).send({ message: "Erro ao realizar refresh", error: error.message });
   }
-}
+};
+
+export const addAddressOnUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { cep, street, number, complement, city, state } = req.body;
+
+    const user = await usersRepository.getUserById(userId);
+
+    if (!user) {
+      return res.status(404).send({ message: "Usuário não encontrado" });
+    }
+
+    const address = {
+      cep,
+      street,
+      number,
+      complement,
+      city,
+      state
+    }
+
+    await usersRepository.addAddressOnUser(userId, address);
+
+    return res.status(200).send({ message: "Endereço adicionado com sucesso", address });
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao adicionar endereço", error: error.message });
+  }
+};
+
+export const getAddressByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await usersRepository.getUserById(userId);
+
+    if (!user) {
+      return res.status(404).send({ message: "Usuário não encontrado" });
+    }
+
+    const address = await usersRepository.getAddressByUserId(userId);
+
+    if (!address) {
+      return res.status(404).send({ message: "Usuário não possui endereço cadastrado" });
+    }
+
+    return res.status(200).send({ message: "Endereço encontrado", address });
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao buscar endereço", error: error.message });
+  }
+};
+
+export const updateAddress = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { cep, street, number, complement, city, state } = req.body;
+
+    const address = {
+      cep,
+      street,
+      number,
+      complement,
+      city,
+      state
+    };
+
+    await usersRepository.updateAddressOnUser(id, address);
+
+    return res.status(200).send({ message: "Endereço atualizado com sucesso", address });
+
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao atualizar endereço", error: error.message });
+  };
+};
+
+export const deleteAddress = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const address = await usersRepository.getAddressById(id);
+
+    if (!address) {
+      return res.status(404).send({ message: "Endereço não encontrado" });
+    }
+
+    await usersRepository.deleteAddress(id);
+
+    return res.status(200).send({ message: "Endereço deletado com sucesso", address });
+
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao deletar endereço", error: error.message });
+  }
+};

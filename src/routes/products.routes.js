@@ -9,7 +9,8 @@ import {
   updateProduct,
   addImageOnProduct,
   deleteProductImage,
-  updateProductImage
+  updateProductImage,
+  getProductByCategory
 } from "../controllers/products.controller.js";
 import { ensureAuthenticated } from "../middlewares/ensureAuthenticated.js";
 
@@ -24,6 +25,8 @@ productsRouter.delete("/:id", deleteProduct);
 productsRouter.post("/image/:id", addImageOnProduct);
 productsRouter.delete("/image/:productId", deleteProductImage);
 productsRouter.put("/image/:productId", updateProductImage);
+
+productsRouter.get("/category/:category", getProductByCategory);
 
 
 export default productsRouter;

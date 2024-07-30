@@ -2,7 +2,7 @@ import pg from "../../database/index.js"
 export default class UsersRepository {
   constructor() {
     this.pg = pg;
-  }
+  };
 
   async getUsers() {
     try {
@@ -11,7 +11,7 @@ export default class UsersRepository {
     } catch (error) {
       throw error;
     }
-  }
+  };
 
   async getUserById(id) {
     try {
@@ -20,21 +20,23 @@ export default class UsersRepository {
     } catch (error) {
       throw error;
     }
-  }
+  };
 
   async createUser(user) {
     try {
-      await this.pg.none("INSERT INTO users (id, name, cnpj, password) VALUES ($1, $2, $3, $4)", [
+      await this.pg.none("INSERT INTO users (id, name, cnpj, tel, password) VALUES ($1, $2, $3, $4, $5)", [
         user.id,
         user.name,
         user.cnpj,
+        user.tel,
         user.password
       ]);
       return user;
     } catch (error) {
       throw error;
     }
-  }
+  };
+
   async updateUser(id, name, cnpj, password) {
     try {
       const user = this.getUserById(id);
@@ -52,7 +54,7 @@ export default class UsersRepository {
     } catch (error) {
       throw error;
     }
-  }
+  };
 
   async getUserByCnpj(cnpj) {
     try {
@@ -61,7 +63,16 @@ export default class UsersRepository {
     } catch (error) {
       throw error;
     }
-  }
+  };
+
+  async getUserByTel(tel) {
+    try {
+      const user = await this.pg.oneOrNone("SELECT * FROM users WHERE tel = $1", tel);
+      return user;
+    } catch (error) {
+      throw error;
+    }
+  };
 
   async getUserByName(name) {
     try {
@@ -70,7 +81,7 @@ export default class UsersRepository {
     } catch (error) {
       throw error;
     }
-  }
+  };
 
 
   async deleteUser(id) {
@@ -80,4 +91,64 @@ export default class UsersRepository {
       throw error;
     }
   }
-}
+
+  async addAddressOnUser(id, address) {
+    try {
+      const userAddress = await this.pg.oneOrNone("INSERT INTO address_users (user_id, cep, street, number, complement, city, state) VALUES ($1, $2, $3, $4, $5, $6, $7)", [
+        id,
+        address.cep,
+        address.street,
+        address.number,
+        address.complement,
+        address.city,
+        address.state
+      ]);
+      return userAddress;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getAddressByUserId(id) {
+    try {
+      const address = await this.pg.manyOrNone("SELECT * FROM address_users WHERE user_id = $1", id);
+      return address;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  async updateAddressOnUser(id, address) {
+    try {
+      const userAddress = await this.pg.oneOrNone("UPDATE address_users SET cep = $1, street = $2, number = $3, complement = $4, city = $5, state = $6 WHERE id = $7", [
+        address.cep,
+        address.street,
+        address.number,
+        address.complement,
+        address.city,
+        address.state,
+        id
+      ]);
+      return userAddress;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  async getAddressById(id) {
+    try {
+      const address = await this.pg.oneOrNone("SELECT * FROM address_users WHERE id = $1", id);
+      return address;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  async deleteAddress(id) {
+    try {
+      await this.pg.none("DELETE FROM address_users WHERE id = $1", id);
+    } catch (error) {
+      throw error;
+    }
+  };
+};
