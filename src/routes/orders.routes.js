@@ -10,7 +10,7 @@ import {
   createOrderDetail,
   updateOrderDetail,
   deleteOrderDetail,
-  getOrderByName
+  getOrderByIdUser
 } from "../controllers/orders.controller.js";
 import { ensureAuthenticated } from "../middlewares/ensureAuthenticated.js";
 
@@ -25,7 +25,7 @@ ordersRouter.get("/details/:id", getOrderDetailById);
 ordersRouter.post("/details", ensureAuthenticated, createOrderDetail);
 ordersRouter.put("/details/:id", updateOrderDetail);
 ordersRouter.delete("/details/:id", deleteOrderDetail);
-ordersRouter.get("/name/:name/:category?", ensureAuthenticated, getOrderByName);
+ordersRouter.get("/user/:id/:category?", ensureAuthenticated, getOrderByIdUser);
 
 
 

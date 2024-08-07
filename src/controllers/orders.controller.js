@@ -17,7 +17,7 @@ export const getOrders = async (req, res) => {
   } catch (error) {
     return res.status(500).send({ message: "Erro ao buscar pedidos", error: error.message });
   }
-}
+};
 
 export const getOrderById = async (req, res) => {
   try {
@@ -33,7 +33,7 @@ export const getOrderById = async (req, res) => {
   } catch (error) {
     return res.status(500).send({ message: "Erro ao buscar pedido", error: error.message });
   }
-}
+};
 
 export const createOrder = async (req, res) => {
   try {
@@ -52,7 +52,7 @@ export const createOrder = async (req, res) => {
   } catch (error) {
     return res.status(500).send({ message: "Erro ao criar pedido", error: error.message });
   }
-}
+};
 
 export const updateOrder = async (req, res) => {
   try {
@@ -77,7 +77,7 @@ export const updateOrder = async (req, res) => {
   } catch (error) {
     return res.status(500).send({ message: "Erro ao atualizar pedido", error: error.message });
   }
-}
+};
 
 export const deleteOrder = async (req, res) => {
   try {
@@ -95,7 +95,7 @@ export const deleteOrder = async (req, res) => {
   } catch (error) {
     return res.status(500).send({ message: "Erro ao excluir pedido", error: error.message });
   }
-}
+};
 
 export const getOrderDetailById = async (req, res) => {
   try {
@@ -111,7 +111,7 @@ export const getOrderDetailById = async (req, res) => {
   } catch (error) {
     return res.status(500).send({ message: "Erro ao buscar detalhes do pedido", error: error.message });
   }
-}
+};
 
 export const createOrderDetail = async (req, res) => {
   try {
@@ -147,7 +147,7 @@ export const createOrderDetail = async (req, res) => {
   } catch (error) {
     return res.status(500).send({ message: "Erro ao criar detalhe do pedido", error: error.message });
   }
-}
+};
 
 export const updateOrderDetail = async (req, res) => {
   try {
@@ -178,7 +178,7 @@ export const updateOrderDetail = async (req, res) => {
   } catch (error) {
     return res.status(500).send({ message: "Erro ao atualizar detalhe do pedido", error: error.message });
   }
-}
+};
 
 export const deleteOrderDetail = async (req, res) => {
   try {
@@ -196,25 +196,36 @@ export const deleteOrderDetail = async (req, res) => {
   } catch (error) {
     return res.status(500).send({ message: "Erro ao excluir detalhe do pedido", error: error.message });
   }
-}
+};
 
-export const getOrderByName = async (req, res) => {
+export const getOrderByIdUser = async (req, res) => {
   try {
-    const { name } = req.params;
-    const userAlreadyExists = await usersRepository.getUserByName(name);
+    const { id } = req.params;
+    const { category } = req.params;
+    const userAlreadyExists = await usersRepository.getUserById(id);
 
     if (!userAlreadyExists) {
       return res.status(404).send({ message: "Usuário não encontrado" });
     }
 
-    const allOrders = await ordersRepository.getOrdersByName(name);
+    if (category) {
+      const allOrders = await ordersRepository.getOrdersByIdUserAndCategory(id, category);
 
-    if (allOrders.length === 0) {
-      return res.status(404).send({ message: "Este usuário não possui pedidos ainda" });
+      if (allOrders.length === 0) {
+        return res.status(404).send({ message: "Este usuário não possui pedidos nesta categoria" });
+      }
+
+      return res.status(200).send(allOrders);
+    } else {
+      const allOrders = await ordersRepository.getOrdersByIdUser(id);
+
+      if (allOrders.length === 0) {
+        return res.status(404).send({ message: "Este usuário não possui pedidos ainda" });
+      }
+
+      return res.status(200).send(allOrders);
     }
-
-    return res.status(200).send(allOrders);
   } catch (error) {
-    return res.status(500).send({ message: "Erro ao buscar todos os pedidos por nome de usuario", error: error.message });
+    return res.status(500).send({ message: "Erro ao buscar todos os pedidos por id de usuario", error: error.message });
   }
-}
+};
