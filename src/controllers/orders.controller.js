@@ -203,28 +203,18 @@ export const deleteOrderDetail = async (req, res) => {
 export const getOrderByIdUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { category } = req.params;
+    const { category } = req.query;
     const userAlreadyExists = await usersRepository.getUserById(id);
     // verificacao se usuario existe
     if (!userAlreadyExists) {
       return res.status(404).send({ message: "Usuário não encontrado" });
     }
     // verificacao se na rota passa a categoria se sim busca por categoria se nao busca todos
-    if (category) {
-      const allOrders = await ordersRepository.getOrdersByIdUserAndCategory(id, category);
-
-      if (allOrders.length === 0) {
-        return res.status(404).send({ message: "Este usuário não possui pedidos nesta categoria" });
-      }
-
+    if (category == "tudo") {
+      const allOrders = await ordersRepository.getOrdersByIdUser(id);
       return res.status(200).send(allOrders);
     } else {
-      const allOrders = await ordersRepository.getOrdersByIdUser(id);
-
-      if (allOrders.length === 0) {
-        return res.status(404).send({ message: "Este usuário não possui pedidos ainda" });
-      }
-
+      const allOrders = await ordersRepository.getOrdersByIdUserAndCategory(id, category);
       return res.status(200).send(allOrders);
     }
   } catch (error) {

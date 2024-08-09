@@ -27,7 +27,7 @@ ordersRouter.post("/details", ensureAuthenticated, createOrderDetail);
 ordersRouter.put("/details/:id", updateOrderDetail);
 ordersRouter.delete("/details/:id", deleteOrderDetail);
 
-ordersRouter.get("/user/:id/:category?", ensureAuthenticated, getOrderByIdUser);
+ordersRouter.get("/user/:id", ensureAuthenticated, getOrderByIdUser);
 
 
 

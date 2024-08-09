@@ -24,7 +24,6 @@ export default class RefreshRepository {
       const token = await this.pg.oneOrNone("SELECT * FROM refresh_token WHERE id = $1", refreshToken);
 
       if (!token) {
-        console.log("token nao encontrado");
         return null;
       };
       const now = dayjs().unix();
