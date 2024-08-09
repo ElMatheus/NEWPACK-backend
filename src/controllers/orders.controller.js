@@ -8,6 +8,8 @@ const ordersRepository = new OrdersRepository();
 const usersRepository = new UsersRepository();
 const productsRepository = new ProductsRepository();
 
+
+// todas os pedidos
 export const getOrders = async (req, res) => {
   try {
     const allOrders = await ordersRepository.getOrders();
@@ -18,12 +20,12 @@ export const getOrders = async (req, res) => {
     return res.status(500).send({ message: "Erro ao buscar pedidos", error: error.message });
   }
 };
-
+// pedidos por id do pedido
 export const getOrderById = async (req, res) => {
   try {
     const { id } = req.params;
     const order = await ordersRepository.getOrderById(id);
-
+    // verificacao se ja existe no banco
     if (!order) {
       return res.status(404).send({ message: "Pedido não encontrado" });
     }
@@ -34,12 +36,12 @@ export const getOrderById = async (req, res) => {
     return res.status(500).send({ message: "Erro ao buscar pedido", error: error.message });
   }
 };
-
+// criacao de pedido
 export const createOrder = async (req, res) => {
   try {
     const { client_id, status } = req.body;
     const userAlreadyExists = await usersRepository.getUserById(client_id);
-
+    // verificacao se existe o id do usuario
     if (!userAlreadyExists) {
       return res.status(404).send({ message: "Usuário não encontrado" });
     }
@@ -53,19 +55,19 @@ export const createOrder = async (req, res) => {
     return res.status(500).send({ message: "Erro ao criar pedido", error: error.message });
   }
 };
-
+// atualizar pedido
 export const updateOrder = async (req, res) => {
   try {
     const { id } = req.params;
     const { client_id, order_date, status } = req.body;
     const userAlreadyExists = await usersRepository.getUserById(client_id);
-
+    // verificacao se existe o id do usuario
     if (!userAlreadyExists) {
       return res.status(404).send({ message: "Usuário não encontrado" });
     }
 
     const orderAlreadyExists = await ordersRepository.getOrderById(id);
-
+    // verificacao se pedido existe
     if (!orderAlreadyExists) {
       return res.status(404).send({ message: "Pedido não encontrado" });
     }
@@ -78,12 +80,12 @@ export const updateOrder = async (req, res) => {
     return res.status(500).send({ message: "Erro ao atualizar pedido", error: error.message });
   }
 };
-
+// deletar pedido
 export const deleteOrder = async (req, res) => {
   try {
     const { id } = req.params;
     const orderAlreadyExists = await ordersRepository.getOrderById(id);
-
+    // verificacao se pedido existe
     if (!orderAlreadyExists) {
       return res.status(404).send({ message: "Pedido não encontrado" });
     }
@@ -96,12 +98,12 @@ export const deleteOrder = async (req, res) => {
     return res.status(500).send({ message: "Erro ao excluir pedido", error: error.message });
   }
 };
-
+// pegar detalhes do pedido por id (pedido com produtos)
 export const getOrderDetailById = async (req, res) => {
   try {
     const { id } = req.params;
     const orderDetail = await ordersRepository.getOrderDetailById(id);
-
+    // verificacao se detalhe do pedido existe
     if (!orderDetail) {
       return res.status(404).send({ message: "Detalhe do pedido não encontrado" });
     }
@@ -112,24 +114,24 @@ export const getOrderDetailById = async (req, res) => {
     return res.status(500).send({ message: "Erro ao buscar detalhes do pedido", error: error.message });
   }
 };
-
+// criar detalhe do pedido (um pedido com produtos e quantidade)
 export const createOrderDetail = async (req, res) => {
   try {
     const { order_id, product_id, quantity } = req.body;
     const orderAlreadyExists = await ordersRepository.getOrderById(order_id);
-
+    // verificacao se detalhe do pedido existe
     if (!orderAlreadyExists) {
       return res.status(404).send({ message: "Pedido não encontrado" });
     }
 
     const productAlreadyExists = await productsRepository.getProductById(product_id);
-
+    // verificacao se produto existe
     if (!productAlreadyExists) {
       return res.status(404).send({ message: "Produto não encontrado" });
     }
 
     const productAlreadyExistsInOrder = await ordersRepository.getProductInOrder(order_id, product_id);
-
+    // verificacao se produto ja existe no pedido se sim atualiza a quantidade
     if (productAlreadyExistsInOrder) {
       productAlreadyExistsInOrder.quantity += Number(quantity);
       const updateProductInOrder = await ordersRepository.updateOrderDetail(productAlreadyExistsInOrder.id, productAlreadyExistsInOrder.order_id, productAlreadyExistsInOrder.product_id, productAlreadyExistsInOrder.quantity, productAlreadyExistsInOrder.unitary_price);
@@ -148,25 +150,25 @@ export const createOrderDetail = async (req, res) => {
     return res.status(500).send({ message: "Erro ao criar detalhe do pedido", error: error.message });
   }
 };
-
+// atualizar detalhe do pedido
 export const updateOrderDetail = async (req, res) => {
   try {
     const { id } = req.params;
     const { order_id, product_id, quantity, unitary_price } = req.body;
     const orderAlreadyExists = await ordersRepository.getOrderById(order_id);
-
+    // verificacao se pedido existe
     if (!orderAlreadyExists) {
       return res.status(404).send({ message: "Pedido não encontrado" });
     }
 
     const productAlreadyExists = await productsRepository.getProductById(product_id);
-
+    // verificacao se produto existe
     if (!productAlreadyExists) {
       return res.status(404).send({ message: "Produto não encontrado" });
     }
 
     const orderDetailAlreadyExists = await ordersRepository.getOrderDetailById(id);
-
+    // verificacao se detalhe do pedido existe
     if (!orderDetailAlreadyExists) {
       return res.status(404).send({ message: "Detalhe do pedido não encontrado" });
     }
@@ -179,12 +181,12 @@ export const updateOrderDetail = async (req, res) => {
     return res.status(500).send({ message: "Erro ao atualizar detalhe do pedido", error: error.message });
   }
 };
-
+// deletar detalhe do pedido
 export const deleteOrderDetail = async (req, res) => {
   try {
     const { id } = req.params;
     const orderDetailAlreadyExists = await ordersRepository.getOrderDetailById(id);
-
+    // verificacao se detalhe do pedido existe
     if (!orderDetailAlreadyExists) {
       return res.status(404).send({ message: "Detalhe do pedido não encontrado" });
     }
@@ -197,17 +199,17 @@ export const deleteOrderDetail = async (req, res) => {
     return res.status(500).send({ message: "Erro ao excluir detalhe do pedido", error: error.message });
   }
 };
-
+// pegar pedido por id do usuario
 export const getOrderByIdUser = async (req, res) => {
   try {
     const { id } = req.params;
     const { category } = req.params;
     const userAlreadyExists = await usersRepository.getUserById(id);
-
+    // verificacao se usuario existe
     if (!userAlreadyExists) {
       return res.status(404).send({ message: "Usuário não encontrado" });
     }
-
+    // verificacao se na rota passa a categoria se sim busca por categoria se nao busca todos
     if (category) {
       const allOrders = await ordersRepository.getOrdersByIdUserAndCategory(id, category);
 

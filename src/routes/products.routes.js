@@ -22,6 +22,7 @@ productsRouter.get("/image/:image", getProductByImage);
 productsRouter.post("/", createProduct);
 productsRouter.put("/:id", updateProduct);
 productsRouter.delete("/:id", deleteProduct);
+
 productsRouter.post("/image/:id", addImageOnProduct);
 productsRouter.delete("/image/:productId", deleteProductImage);
 productsRouter.put("/image/:productId", updateProductImage);
