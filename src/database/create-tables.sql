@@ -28,8 +28,8 @@ CREATE TABLE IF NOT EXISTS refresh_token (
 CREATE TABLE IF NOT EXISTS products (
     id INT PRIMARY KEY NOT NULL,
     name VARCHAR(255) NOT NULL,
-    toughness VARCHAR(140) NOT NULL,
-    dimension VARCHAR(140) NOT NULL,
+    toughness VARCHAR(140),
+    dimension VARCHAR(140),
     type VARCHAR(140) NOT NULL,
     category VARCHAR(140) NOT NULL,
     description TEXT NOT NULL,
