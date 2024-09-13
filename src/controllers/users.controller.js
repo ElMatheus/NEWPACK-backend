@@ -205,6 +205,8 @@ export const addAddressOnUser = async (req, res) => {
     if (!user) {
       return res.status(404).send({ message: "Usuário não encontrado" });
     }
+
+    const freight = city.toLowerCase() == 'valinhos' ? 'CIF' : 'FOB';
     // objeto endereco
     const address = {
       cep,
@@ -212,7 +214,8 @@ export const addAddressOnUser = async (req, res) => {
       number,
       complement,
       city,
-      state
+      state,
+      freight
     }
 
     await usersRepository.addAddressOnUser(userId, address);
@@ -250,13 +253,16 @@ export const updateAddress = async (req, res) => {
     const { id } = req.params;
     const { cep, street, number, complement, city, state } = req.body;
 
+    const freight = city.toLowerCase() == 'valinhos' ? 'CIF' : 'FOB';
+
     const address = {
       cep,
       street,
       number,
       complement,
       city,
-      state
+      state,
+      freight
     };
 
     await usersRepository.updateAddressOnUser(id, address);

@@ -94,14 +94,15 @@ export default class UsersRepository {
 
   async addAddressOnUser(id, address) {
     try {
-      const userAddress = await this.pg.oneOrNone("INSERT INTO address_users (user_id, cep, street, number, complement, city, state) VALUES ($1, $2, $3, $4, $5, $6, $7)", [
+      const userAddress = await this.pg.oneOrNone("INSERT INTO address_users (user_id, cep, street, number, complement, city, state, freight) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)", [
         id,
         address.cep,
         address.street,
         address.number,
         address.complement,
         address.city,
-        address.state
+        address.state,
+        address.freight
       ]);
       return userAddress;
     } catch (error) {
@@ -120,13 +121,14 @@ export default class UsersRepository {
 
   async updateAddressOnUser(id, address) {
     try {
-      const userAddress = await this.pg.oneOrNone("UPDATE address_users SET cep = $1, street = $2, number = $3, complement = $4, city = $5, state = $6 WHERE id = $7", [
+      const userAddress = await this.pg.oneOrNone("UPDATE address_users SET cep = $1, street = $2, number = $3, complement = $4, city = $5, state = $6, freight = $7 WHERE id = $8", [
         address.cep,
         address.street,
         address.number,
         address.complement,
         address.city,
         address.state,
+        address.freight,
         id
       ]);
       return userAddress;

@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS address_users (
     complement VARCHAR(255),
     city VARCHAR(255) NOT NULL,
     state VARCHAR(2) NOT NULL,
+    freight VARCHAR(3) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
