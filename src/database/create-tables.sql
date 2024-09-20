@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS address_users (
     city VARCHAR(255) NOT NULL,
     state VARCHAR(2) NOT NULL,
     freight VARCHAR(3) NOT NULL,
+    active BOOLEAN DEFAULT true,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 

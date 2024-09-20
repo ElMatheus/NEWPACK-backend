@@ -207,6 +207,7 @@ export const addAddressOnUser = async (req, res) => {
     }
 
     const freight = city.toLowerCase() == 'valinhos' ? 'CIF' : 'FOB';
+
     // objeto endereco
     const address = {
       cep,
@@ -215,8 +216,10 @@ export const addAddressOnUser = async (req, res) => {
       complement,
       city,
       state,
-      freight
+      freight,
     }
+
+    await usersRepository.updateActiveAddress(userId);
 
     await usersRepository.addAddressOnUser(userId, address);
 
@@ -247,13 +250,45 @@ export const getAddressByUserId = async (req, res) => {
     return res.status(500).send({ message: "Erro ao buscar endereço", error: error.message });
   }
 };
+// pegar o endereco ativo do usuario pelo id
+export const getActiveAddressByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await usersRepository.getUserById(userId);
+    // verificacao se usuario existe
+    if (!user) {
+      return res.status(404).send({ message: "Usuário não encontrado" });
+    }
+
+    const address = await usersRepository.getActiveAddressByUserId(userId);
+
+    if (!address) {
+      return res.status(404).send({ message: "Usuário não possui endereço ativo cadastrado" });
+    }
+
+    return res.status(200).send({ message: "Endereço ativo encontrado", address });
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao buscar endereço ativo de um usuario", error: error.message });
+  }
+};
 // atualizar endereco
 export const updateAddress = async (req, res) => {
   try {
     const { id } = req.params;
-    const { cep, street, number, complement, city, state } = req.body;
+    const { cep, street, number, complement, city, state, active } = req.body;
 
     const freight = city.toLowerCase() == 'valinhos' ? 'CIF' : 'FOB';
+
+    const addressById = await usersRepository.getAddressById(id);
+
+    if (!addressById) {
+      return res.status(404).send({ message: "Endereço não encontrado" });
+    }
+
+    if (active === true) {
+      await usersRepository.updateActiveAddress(addressById.user_id);
+    }
 
     const address = {
       cep,
@@ -262,7 +297,8 @@ export const updateAddress = async (req, res) => {
       complement,
       city,
       state,
-      freight
+      freight,
+      active
     };
 
     await usersRepository.updateAddressOnUser(id, address);

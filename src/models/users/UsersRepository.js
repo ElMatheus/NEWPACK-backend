@@ -110,6 +110,14 @@ export default class UsersRepository {
     }
   }
 
+  async updateActiveAddress(id_user) {
+    try {
+      await this.pg.none("UPDATE address_users SET active = false WHERE user_id = $1", id_user);
+    } catch (error) {
+      throw error;
+    }
+  };
+
   async getAddressByUserId(id) {
     try {
       const address = await this.pg.manyOrNone("SELECT * FROM address_users WHERE user_id = $1", id);
@@ -119,9 +127,18 @@ export default class UsersRepository {
     }
   };
 
+  async getActiveAddressByUserId(id_user) {
+    try {
+      const address = await this.pg.oneOrNone("SELECT * FROM address_users WHERE user_id = $1 AND active = true", id_user);
+      return address;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   async updateAddressOnUser(id, address) {
     try {
-      const userAddress = await this.pg.oneOrNone("UPDATE address_users SET cep = $1, street = $2, number = $3, complement = $4, city = $5, state = $6, freight = $7 WHERE id = $8", [
+      const userAddress = await this.pg.oneOrNone("UPDATE address_users SET cep = $1, street = $2, number = $3, complement = $4, city = $5, state = $6, freight = $7, active = $8 WHERE id = $9", [
         address.cep,
         address.street,
         address.number,
@@ -129,8 +146,10 @@ export default class UsersRepository {
         address.city,
         address.state,
         address.freight,
+        address.active,
         id
       ]);
+
       return userAddress;
     } catch (error) {
       throw error;
