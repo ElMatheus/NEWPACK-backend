@@ -233,10 +233,25 @@ export const getAddressByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
 
+    const { active } = req.query;
+
+    console.log(active);
+
+
     const user = await usersRepository.getUserById(userId);
     // verificacao se usuario existe
     if (!user) {
       return res.status(404).send({ message: "Usuário não encontrado" });
+    }
+
+    if (active) {
+      const address = await usersRepository.getActiveAddressByUserId(userId);
+      // verificacao se usuario tem endereco ativo
+      if (!address) {
+        return res.status(404).send({ message: "Usuário não possui endereço ativo cadastrado" });
+      }
+
+      return res.status(200).send({ message: "Endereço ativo encontrado", address });
     }
 
     const address = await usersRepository.getAddressByUserId(userId);
@@ -248,28 +263,6 @@ export const getAddressByUserId = async (req, res) => {
     return res.status(200).send({ message: "Endereço encontrado", address });
   } catch (error) {
     return res.status(500).send({ message: "Erro ao buscar endereço", error: error.message });
-  }
-};
-// pegar o endereco ativo do usuario pelo id
-export const getActiveAddressByUserId = async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    const user = await usersRepository.getUserById(userId);
-    // verificacao se usuario existe
-    if (!user) {
-      return res.status(404).send({ message: "Usuário não encontrado" });
-    }
-
-    const address = await usersRepository.getActiveAddressByUserId(userId);
-
-    if (!address) {
-      return res.status(404).send({ message: "Usuário não possui endereço ativo cadastrado" });
-    }
-
-    return res.status(200).send({ message: "Endereço ativo encontrado", address });
-  } catch (error) {
-    return res.status(500).send({ message: "Erro ao buscar endereço ativo de um usuario", error: error.message });
   }
 };
 // atualizar endereco

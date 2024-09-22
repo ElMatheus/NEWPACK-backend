@@ -11,7 +11,6 @@ import {
   refresh,
   addAddressOnUser,
   getAddressByUserId,
-  getActiveAddressByUserId,
   updateAddress,
   deleteAddress
 } from "../controllers/users.controller.js";
@@ -25,7 +24,6 @@ usersRouter.get("/name/:name", getUserByName);
 usersRouter.post("/", createUser);
 
 usersRouter.get("/address/:userId", getAddressByUserId);
-usersRouter.get("/activeaddress/:userId", getActiveAddressByUserId);
 usersRouter.post("/address/:userId", addAddressOnUser);
 usersRouter.put("/address/:id", updateAddress);
 usersRouter.delete("/address/:id", deleteAddress);
