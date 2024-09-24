@@ -235,9 +235,6 @@ export const getAddressByUserId = async (req, res) => {
 
     const { active } = req.query;
 
-    console.log(active);
-
-
     const user = await usersRepository.getUserById(userId);
     // verificacao se usuario existe
     if (!user) {
