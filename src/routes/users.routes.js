@@ -34,7 +34,4 @@ usersRouter.post("/login", loginUser);
 usersRouter.post("/refresh", refresh);
 
 
-
-
-
 export default usersRouter;

@@ -120,7 +120,7 @@ export default class UsersRepository {
 
   async getAddressByUserId(id) {
     try {
-      const address = await this.pg.manyOrNone("SELECT * FROM address_users WHERE user_id = $1", id);
+      const address = await this.pg.manyOrNone("SELECT * FROM address_users WHERE user_id = $1 ORDER BY active DESC, street ASC", id);
       return address;
     } catch (error) {
       throw error;
