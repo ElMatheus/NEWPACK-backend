@@ -23,8 +23,8 @@ usersRouter.get("/:id", ensureAuthenticated, getUserById);
 usersRouter.get("/name/:name", getUserByName);
 usersRouter.post("/", createUser);
 
-usersRouter.get("/address/:userId", getAddressByUserId);
-usersRouter.post("/address/:userId", addAddressOnUser);
+usersRouter.get("/address/:userId", ensureAuthenticated, getAddressByUserId);
+usersRouter.post("/address/:userId", ensureAuthenticated, addAddressOnUser);
 usersRouter.put("/address/:id", updateAddress);
 usersRouter.delete("/address/:id", deleteAddress);
 
