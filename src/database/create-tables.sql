@@ -52,6 +52,8 @@ CREATE TABLE IF NOT EXISTS orders (
     client_id VARCHAR(36) NOT NULL,
     order_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(50) NOT NULL,
+    description TEXT,
+    installment INT NOT NULL,
     FOREIGN KEY (client_id) REFERENCES users(id)
 );
 

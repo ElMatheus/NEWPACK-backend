@@ -39,17 +39,17 @@ export const getOrderById = async (req, res) => {
 // criacao de pedido
 export const createOrder = async (req, res) => {
   try {
-    const { client_id, status } = req.body;
+    const { client_id, status, description, installment } = req.body;
     const userAlreadyExists = await usersRepository.getUserById(client_id);
     // verificacao se existe o id do usuario
     if (!userAlreadyExists) {
       return res.status(404).send({ message: "Usuário não encontrado" });
     }
-    const newOrder = new Order(client_id, status);
+    const newOrder = new Order(client_id, status, description, installment);
 
-    await ordersRepository.createOrder(newOrder);
+    const order = await ordersRepository.createOrder(newOrder);
 
-    return res.status(201).send({ message: "Pedido criado com sucesso", newOrder });
+    return res.status(201).send({ message: "Pedido criado com sucesso", order });
 
   } catch (error) {
     return res.status(500).send({ message: "Erro ao criar pedido", error: error.message });
@@ -59,7 +59,7 @@ export const createOrder = async (req, res) => {
 export const updateOrder = async (req, res) => {
   try {
     const { id } = req.params;
-    const { client_id, order_date, status } = req.body;
+    const { client_id, order_date, status, description, installment } = req.body;
     const userAlreadyExists = await usersRepository.getUserById(client_id);
     // verificacao se existe o id do usuario
     if (!userAlreadyExists) {
@@ -72,7 +72,7 @@ export const updateOrder = async (req, res) => {
       return res.status(404).send({ message: "Pedido não encontrado" });
     }
 
-    const updatedOrder = await ordersRepository.updateOrder(id, client_id, order_date, status);
+    const updatedOrder = await ordersRepository.updateOrder(id, client_id, order_date, status, description, installment);
 
     return res.status(200).send({ message: "Pedido atualizado com sucesso", updatedOrder });
 
@@ -142,7 +142,7 @@ export const createOrderDetail = async (req, res) => {
 
     await ordersRepository.createOrderDetail(newOrderDetail);
 
-    await ordersRepository.updateOrder(order_id, orderAlreadyExists.client_id, orderAlreadyExists.order_date, "Pendente");
+    // await ordersRepository.updateOrder(order_id, orderAlreadyExists.client_id, orderAlreadyExists.order_date, "Pendente", orderAlreadyExists.description, orderAlreadyExists.installment);
 
     return res.status(201).send({ message: "Detalhe do pedido criado com sucesso", newOrderDetail });
 

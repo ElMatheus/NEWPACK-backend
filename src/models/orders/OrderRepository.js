@@ -6,7 +6,7 @@ export default class ProductsRepository {
 
   async getOrders() {
     try {
-      const allOrders = await this.pg.manyOrNone("SELECT order_details.id AS orderDetail_id, orders.id AS order_id, orders.client_id, users.name AS client_name, orders.order_date, orders.status, order_details.product_id, products.name AS product_name, order_details.quantity, order_details.unitary_price,order_details.full_price FROM orders INNER JOIN users ON orders.client_id = users.id LEFT JOIN order_details ON orders.id = order_details.order_id LEFT JOIN products ON order_details.product_id = products.id");
+      const allOrders = await this.pg.manyOrNone("SELECT order_details.id AS orderDetail_id, orders.id AS order_id, orders.client_id, users.name AS client_name, orders.order_date, orders.status, orders.installment, orders.description, order_details.product_id, products.name AS product_name, order_details.quantity, order_details.unitary_price,order_details.full_price FROM orders INNER JOIN users ON orders.client_id = users.id LEFT JOIN order_details ON orders.id = order_details.order_id LEFT JOIN products ON order_details.product_id = products.id");
       return allOrders;
     } catch (error) {
       throw error;
@@ -25,8 +25,8 @@ export default class ProductsRepository {
   async createOrder(order) {
     try {
       const newOrder = await this.pg.one(
-        "INSERT INTO orders (client_id, status) VALUES ($1,$2) RETURNING *",
-        [order.client_id, order.status]
+        "INSERT INTO orders (client_id, status, description, installment) VALUES ($1,$2,$3,$4) RETURNING id, client_id, status, description, installment",
+        [order.client_id, order.status, order.description, order.installment]
       );
       return newOrder;
     } catch (error) {
@@ -34,11 +34,11 @@ export default class ProductsRepository {
     }
   }
 
-  async updateOrder(id, client_id, order_date, status) {
+  async updateOrder(id, client_id, order_date, status, description, installment) {
     try {
       const updateUser = await this.pg.oneOrNone(
-        "UPDATE orders SET client_id = $1, order_date = $2, status = $3 WHERE id = $4 RETURNING *",
-        [client_id, order_date, status, id]
+        "UPDATE orders SET client_id = $1, order_date = $2, status = $3, description = $4, installment = $5 WHERE id = $6 RETURNING *",
+        [client_id, order_date, status, description, installment, id]
       );
 
       return updateUser;
