@@ -204,6 +204,7 @@ export const getOrderByIdUser = async (req, res) => {
   try {
     const { id } = req.params;
     const { category } = req.query;
+    const { unique } = req.query;
     const userAlreadyExists = await usersRepository.getUserById(id);
     // verificacao se usuario existe
     if (!userAlreadyExists) {
@@ -211,10 +212,10 @@ export const getOrderByIdUser = async (req, res) => {
     }
     // verificacao se na rota passa a categoria se sim busca por categoria se nao busca todos
     if (category == "tudo") {
-      const allOrders = await ordersRepository.getOrdersByIdUser(id);
+      const allOrders = await ordersRepository.getOrdersByIdUser(id, unique);
       return res.status(200).send(allOrders);
     } else {
-      const allOrders = await ordersRepository.getOrdersByIdUserAndCategory(id, category);
+      const allOrders = await ordersRepository.getOrdersByIdUserAndCategory(id, category, unique);
       return res.status(200).send(allOrders);
     }
   } catch (error) {
