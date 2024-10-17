@@ -2,11 +2,12 @@ import Email from "../models/emails/Email.js";
 import OrdersRepository from "../models/orders/OrderRepository.js";
 import ProductsRepository from "../models/products/ProductsRepository.js";
 import EmailsRepository from "../models/emails/EmailsRepository.js";
+import UsersRepository from "../models/users/UsersRepository.js";
 
 const ordersRepository = new OrdersRepository();
 const productsRepository = new ProductsRepository();
 const emailsRepository = new EmailsRepository();
-
+const usersRepository = new UsersRepository();
 
 export const sendEmail = async (req, res) => {
   try {
@@ -17,6 +18,8 @@ export const sendEmail = async (req, res) => {
     if (!orderAlreadyExists) {
       return res.status(404).send({ message: "Pedido não encontrado" });
     }
+
+    const addressUser = await usersRepository.getActiveAddressByUserId(orderAlreadyExists[0].client_id);
 
     let total_price = 0;
 
@@ -39,6 +42,12 @@ export const sendEmail = async (req, res) => {
       orderAlreadyExists[0].order_id,
       orderAlreadyExists[0].client_id,
       orderAlreadyExists[0].client_name,
+      addressUser.cep,
+      addressUser.street,
+      addressUser.city,
+      addressUser.state,
+      addressUser.freight,
+      addressUser.number,
       orderAlreadyExists[0].order_date,
       orderAlreadyExists[0].status,
       orderAlreadyExists[0].description,

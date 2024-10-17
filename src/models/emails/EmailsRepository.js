@@ -27,6 +27,13 @@ export default class EmailsRepository {
         <p><strong>Preço Total do Pedido:</strong> R$${email.preco_total_pedido}</p>
         <p><strong>Parcelas:</strong> ${email.parcelas_pedido}</p>
         <p><strong>Valor das Parcelas:</strong> R$${email.valor_parcelas_pedido}</p>
+        <h2>Endereço</h2>
+        <p><strong>CEP:</strong> ${email.infosAdress.cep}</p>
+        <p><strong>Rua:</strong> ${email.infosAdress.street}</p>
+        <p><strong>Cidade:</strong> ${email.infosAdress.city}</p>
+        <p><strong>Estado:</strong> ${email.infosAdress.state}</p>
+        <p><strong>Frete:</strong> ${email.infosAdress.freight}</p>
+        <p><strong>Número:</strong> ${email.infosAdress.number}</p>
         <h2>Produtos</h2>
         <ul>
           ${email.products.map(product => `
