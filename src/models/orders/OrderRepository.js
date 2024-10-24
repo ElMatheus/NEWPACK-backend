@@ -15,7 +15,7 @@ export default class ProductsRepository {
 
   async getOrderById(id) {
     try {
-      const order = await this.pg.manyOrNone("SELECT order_details.id, orders.client_id, orders.order_date, orders.status, orders.description, orders.installment, users.name AS client_name, order_id, product_id, quantity, unitary_price, full_price FROM orders LEFT JOIN users ON orders.client_id = users.id LEFT JOIN order_details ON orders.id = order_details.order_id WHERE orders.id = $1", [id]);
+      const order = await this.pg.manyOrNone("SELECT order_details.id, orders.client_id, orders.order_date, orders.status, orders.description, orders.installment, users.name AS client_name, order_id, product_id, quantity, unitary_price, full_price, (COALESCE(products.quantity_mts, 1) * order_details.full_price) AS total_value FROM orders LEFT JOIN users ON orders.client_id = users.id LEFT JOIN order_details ON orders.id = order_details.order_id LEFT JOIN products ON order_details.product_id = products.id WHERE orders.id = $1", [id]);
       return order;
     } catch (error) {
       throw error;

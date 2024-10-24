@@ -25,7 +25,7 @@ export const sendEmail = async (req, res) => {
 
     const detailsOrder = await Promise.all(orderAlreadyExists.map(async (order) => {
       const product = await productsRepository.getProductById(order.product_id);
-      total_price += Number(order.full_price);
+      total_price += Number(order.total_value);
       return {
         id_produto: product.id,
         nome_produto: product.name,
@@ -34,7 +34,7 @@ export const sendEmail = async (req, res) => {
         descricao_produto: product.description,
         quantidade_produto: order.quantity,
         preco_unico: order.unitary_price,
-        preco_total: order.full_price
+        preco_total: order.total_value
       }
     }));
 
