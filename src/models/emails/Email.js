@@ -1,10 +1,16 @@
 import { format } from 'date-fns';
 
 export default class Email {
-  constructor(id_pedido, id_cliente, nome_cliente, cep_address, street_address, city_address, state_address, freight_address, number_address, data_pedido, status_pedido, descricao_pedido, preco_total_pedido, parcelas_pedido, valor_parcelas_pedido, products) {
+  constructor(id_pedido, id_cliente, nome_cliente, telefone_cliente, cnpj_cliente, name, telephone, cep_address, street_address, city_address, state_address, freight_address, number_address, data_pedido, status_pedido, descricao_pedido, preco_total_pedido, parcelas_pedido, valor_parcelas_pedido, products) {
     this.id_pedido = id_pedido;
     this.id_cliente = id_cliente;
     this.nome_cliente = nome_cliente;
+    this.telefone_cliente = telefone_cliente;
+    this.cnpj_cliente = cnpj_cliente;
+    this.infosClient = {
+      name: name,
+      telephone: telephone
+    };
     this.infosAdress = {
       cep: cep_address,
       street: street_address,
@@ -18,7 +24,7 @@ export default class Email {
     this.descricao_pedido = descricao_pedido;
     this.preco_total_pedido = preco_total_pedido;
     this.parcelas_pedido = parcelas_pedido;
-    this.valor_parcelas_pedido = valor_parcelas_pedido;
+    this.valor_parcelas_pedido = parseFloat(valor_parcelas_pedido.toFixed(2));
     this.products = products;
   }
 

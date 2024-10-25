@@ -12,6 +12,7 @@ const usersRepository = new UsersRepository();
 export const sendEmail = async (req, res) => {
   try {
     const { idOrder } = req.params;
+    const { name, telephone } = req.body;
 
     const orderAlreadyExists = await ordersRepository.getOrderById(idOrder);
 
@@ -42,6 +43,10 @@ export const sendEmail = async (req, res) => {
       orderAlreadyExists[0].order_id,
       orderAlreadyExists[0].client_id,
       orderAlreadyExists[0].client_name,
+      orderAlreadyExists[0].client_tel,
+      orderAlreadyExists[0].client_cnpj,
+      name,
+      telephone,
       addressUser.cep,
       addressUser.street,
       addressUser.city,

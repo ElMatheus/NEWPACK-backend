@@ -21,12 +21,17 @@ export default class EmailsRepository {
         html: `
         <h1>Detalhes do Pedido</h1>
         <p><strong>Cliente:</strong> ${email.nome_cliente}</p>
+        <p><strong>Telefone:</strong> ${email.telefone_cliente}</p>
+        <p><strong>CNPJ:</strong> ${email.cnpj_cliente}</p>
         <p><strong>Data do Pedido:</strong> ${email.data_pedido}</p>
         <p><strong>Status do Pedido:</strong> ${email.status_pedido}</p>
         <p><strong>Descrição do Pedido:</strong> ${email.descricao_pedido}</p>
         <p><strong>Preço Total do Pedido:</strong> R$${email.preco_total_pedido}</p>
         <p><strong>Parcelas:</strong> ${email.parcelas_pedido}</p>
         <p><strong>Valor das Parcelas:</strong> R$${email.valor_parcelas_pedido}</p>
+        <h2>Detalhes do Cliente que Realizou o Pedido</h2>
+        <p><strong>Nome:</strong> ${email.infosClient.name}</p>
+        <p><strong>Telefone:</strong> ${email.infosClient.telephone}</p>
         <h2>Endereço</h2>
         <p><strong>CEP:</strong> ${email.infosAdress.cep}</p>
         <p><strong>Rua:</strong> ${email.infosAdress.street}</p>
