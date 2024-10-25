@@ -142,7 +142,8 @@ export const createOrderDetail = async (req, res) => {
 
     await ordersRepository.createOrderDetail(newOrderDetail);
 
-    // await ordersRepository.updateOrder(order_id, orderAlreadyExists.client_id, orderAlreadyExists.order_date, "Pendente", orderAlreadyExists.description, orderAlreadyExists.installment);
+    // atualiza o status do pedido para pendente e tirar invalid
+    await ordersRepository.updateOrder(order_id, orderAlreadyExists.client_id, orderAlreadyExists.order_date, "Pendente", orderAlreadyExists.description, orderAlreadyExists.installment);
 
     return res.status(201).send({ message: "Detalhe do pedido criado com sucesso", newOrderDetail });
 

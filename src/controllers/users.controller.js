@@ -318,3 +318,15 @@ export const deleteAddress = async (req, res) => {
     return res.status(500).send({ message: "Erro ao deletar endereço", error: error.message });
   }
 };
+
+export const deleteRefreshToken = async (req, res) => {
+  try {
+    const { refreshToken } = req.params;
+
+    await refreshRepository.deleteRefreshToken(refreshToken);
+
+    return res.status(200).send({ message: "Refresh token deletado com sucesso" });
+  } catch (error) {
+    return res.status(500).send({ message: "Erro ao deletar refresh token", error: error.message });
+  }
+};

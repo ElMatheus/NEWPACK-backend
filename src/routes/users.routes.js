@@ -12,7 +12,8 @@ import {
   addAddressOnUser,
   getAddressByUserId,
   updateAddress,
-  deleteAddress
+  deleteAddress,
+  deleteRefreshToken
 } from "../controllers/users.controller.js";
 import { ensureAuthenticated } from "../middlewares/ensureAuthenticated.js";
 
@@ -32,6 +33,7 @@ usersRouter.put("/:id", updateUser);
 usersRouter.delete("/:id", deleteUser);
 usersRouter.post("/login", loginUser);
 usersRouter.post("/refresh", refresh);
+usersRouter.delete("/refresh/:refreshToken", deleteRefreshToken);
 
 
 export default usersRouter;
