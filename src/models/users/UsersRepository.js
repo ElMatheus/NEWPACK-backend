@@ -76,7 +76,7 @@ export default class UsersRepository {
 
   async getUserByName(name) {
     try {
-      const user = await this.pg.oneOrNone("SELECT * FROM users WHERE name = $1", name);
+      const user = await this.pg.oneOrNone("SELECT * FROM users WHERE name ILIKE $1", name);
       return user;
     } catch (error) {
       throw error;
