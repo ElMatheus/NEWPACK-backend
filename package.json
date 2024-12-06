@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Projeto afim de automatizar os pedidos na NEWPACK para melhorar o serviço ao cliente e a eficiência operacional.",
   "main": "src/server.js",
+  "engines": {
+    "node": "21.2.0"
+  },
   "repository": "https://github.com/ElMatheus/NEWPACK-backend",
   "author": "Matheus Gomes <matheusgomesgoncalves.564@gmail.com>",
   "private": true,
