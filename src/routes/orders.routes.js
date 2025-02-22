@@ -29,7 +29,4 @@ ordersRouter.delete("/details/:id", deleteOrderDetail);
 
 ordersRouter.get("/user/:id", ensureAuthenticated, getOrderByIdUser);
 
-
-
-
 export default ordersRouter;

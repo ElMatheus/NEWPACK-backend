@@ -11,7 +11,7 @@ export const ensureAuthenticated = async (req, res, next) => {
   const token = authorization.replace("Bearer", "").trim();
 
   try {
-    verify(token, 'ca94e53c-e4e7-422a-9558-f32670cce6a5');
+    verify(token, process.env.SECRET_TOKEN);
 
     return next();
   } catch (error) {

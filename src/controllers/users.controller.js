@@ -7,6 +7,8 @@ import jwt from 'jsonwebtoken';
 import Refresh from "../models/refreshToken/Refresh.js";
 import validateCnpj from "../helpers/validateCnpj.js";
 import formatCnpj from "../helpers/formatCnpj.js";
+import validateCep from "../helpers/validateCep.js";
+import formatCep from "../helpers/formatCep.js";
 const { sign } = jwt;
 
 const usersRepository = new UsersRepository();
@@ -64,9 +66,13 @@ export const createUser = async (req, res) => {
   try {
     const { name, cnpj, tel, password } = req.body;
 
-    const userAlreadyExistsCnpj = await usersRepository.getUserByCnpj(cnpj);
+    const userAlreadyExistsCnpj = await usersRepository.getUserByCnpj(formatCnpj(cnpj));
     const userAlreadyExistsName = await usersRepository.getUserByName(name);
-    const userAlreadyExistsTel = await usersRepository.getUserByTel(tel);
+
+    if (!name || !cnpj || !tel || !password) {
+      return res.status(400).send({ message: "Preencha todos os campos" });
+    }
+
     // verificacao se usuario ja existe usando o cnpj unico
     if (userAlreadyExistsCnpj) {
       return res.status(409).send({ message: "Cnpj já cadastrado" });
@@ -74,10 +80,6 @@ export const createUser = async (req, res) => {
     // verificacao se usuario ja existe usando o nome unico
     if (userAlreadyExistsName) {
       return res.status(409).send({ message: "Nome já cadastrado" });
-    }
-    // verificacao se usuario ja existe usando o telefone unico
-    if (userAlreadyExistsTel) {
-      return res.status(409).send({ message: "Telefone já cadastrado" });
     }
     // validacao do cnpj
     if (!validateCnpj(cnpj)) {
@@ -99,7 +101,7 @@ export const createUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, cnpj, password } = req.body;
+    const { name, cnpj, tel, password } = req.body;
 
     const userById = await usersRepository.getUserById(id);
     const userByCnpj = await usersRepository.getUserByCnpj(cnpj);
@@ -114,7 +116,7 @@ export const updateUser = async (req, res) => {
     // hash na senha
     const passwordHash = await hash(password, 8);
 
-    const user = await usersRepository.updateUser(id, name, cnpj, passwordHash);
+    const user = await usersRepository.updateUser(id, name, cnpj, tel, passwordHash);
 
     return res
       .status(200)
@@ -160,7 +162,7 @@ export const loginUser = async (req, res) => {
       return res.status(401).send({ message: "Nome ou senha inválidos" });
     }
     // geracao do acess token
-    const token = sign({}, 'ca94e53c-e4e7-422a-9558-f32670cce6a5', {
+    const token = sign({}, process.env.SECRET_TOKEN, {
       subject: user.id,
       expiresIn: '15m'
     });
@@ -184,7 +186,7 @@ export const refresh = async (req, res) => {
       return res.status(404).send({ message: "Token inválido ou expirado" });
     }
     // geracao de novo acess token
-    const newToken = sign({}, 'ca94e53c-e4e7-422a-9558-f32670cce6a5', {
+    const newToken = sign({}, process.env.SECRET_TOKEN, {
       subject: token.user_id,
       expiresIn: '15m'
     });
@@ -206,11 +208,20 @@ export const addAddressOnUser = async (req, res) => {
       return res.status(404).send({ message: "Usuário não encontrado" });
     }
 
+    if (!cep || !street || !number || !city || !state) {
+      return res.status(400).send({ message: "Preencha todos os campos" });
+    }
+
     const freight = city.toLowerCase() == 'valinhos' ? 'CIF' : 'FOB';
+
+    if (!validateCep(formatCep(cep))) {
+      return res.status(400).send({ message: "Cep inválido" });
+    }
+
 
     // objeto endereco
     const address = {
-      cep,
+      cep: formatCep(cep),
       street,
       number,
       complement,
@@ -276,12 +287,17 @@ export const updateAddress = async (req, res) => {
       return res.status(404).send({ message: "Endereço não encontrado" });
     }
 
+    if (!validateCep(formatCep(cep))) {
+      return res.status(400).send({ message: "Cep inválido" });
+    }
+
     if (active === true) {
       await usersRepository.updateActiveAddress(addressById.user_id);
     }
 
     const address = {
-      cep,
+      cep:
+        formatCep(cep),
       street,
       number,
       complement,

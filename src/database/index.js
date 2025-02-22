@@ -14,7 +14,7 @@ const host = process.env.DB_HOST;
 const port = process.env.DB_PORT;
 const database = process.env.DB_NAME;
 
-const dbURL = `postgres://${user}:${password}@${host}:${port}/${database}`;
+const dbURL = `postgres://${user}:${password}@${host}:${port}/${database}?sslmode=require`;
 
 const pg = pgp()(dbURL);
 

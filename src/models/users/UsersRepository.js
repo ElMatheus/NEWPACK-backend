@@ -37,7 +37,7 @@ export default class UsersRepository {
     }
   };
 
-  async updateUser(id, name, cnpj, password) {
+  async updateUser(id, name, cnpj, tel, password) {
     try {
       const user = this.getUserById(id);
 
@@ -46,8 +46,8 @@ export default class UsersRepository {
       }
 
       const updateUser = await this.pg.oneOrNone(
-        "UPDATE users SET name = $1, cnpj = $2, password = $3 WHERE id = $4 RETURNING *",
-        [name, cnpj, password, id]
+        "UPDATE users SET name = $1, cnpj = $2, tel = $3, password = $4 WHERE id = $5 RETURNING *",
+        [name, cnpj, tel, password, id]
       );
 
       return updateUser;

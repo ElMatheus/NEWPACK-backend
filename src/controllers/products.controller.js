@@ -51,6 +51,29 @@ export const createProduct = async (req, res) => {
   try {
     const { id, name, toughness, dimension, type, category, description, quantity_mts, unitary_value } = req.body;
 
+    const productExists = await productsRepository.getProductById(id);
+
+    if (productExists) {
+      return res.status(400).send({ message: "Produto já cadastrado" });
+    }
+
+    if (!id || !name || !type || !category || !unitary_value) {
+      return res.status(400).send({ message: "Dados incompletos" });
+    }
+    if (type !== "caixa" && type !== "rolo" && type !== "unidade") {
+      return res.status(400).send({ message: "Tipo de produto inválido. Os tipos válidos são: caixa, rolo ou unidade." });
+    }
+
+    if (type === "rolo" || type === "unidade") {
+      if (!quantity_mts) {
+        return res.status(400).send({ message: "Dados incompletos" });
+      }
+    }
+
+    if (category !== "cliches" && category !== "facas_rotativas" && category !== "facas_planas" && category !== "facas_graficas" && category !== "outros") {
+      return res.status(400).send({ message: "Categoria de produto inválida. As categorias válidas são: clichês, facas rotativas, facas planas, facas gráficas ou outros." });
+    }
+
     const newProduct = new Product(id, name, toughness, dimension, type, category, description, quantity_mts, unitary_value);
 
     await productsRepository.createProduct(newProduct);
@@ -70,6 +93,20 @@ export const updateProduct = async (req, res) => {
     // verificacao se produto existe
     if (!product) {
       return res.status(404).send({ message: "Produto não encontrado" });
+    }
+
+    if (type !== "caixa" && type !== "rolo" && type !== "unidade") {
+      return res.status(400).send({ message: "Tipo de produto inválido. Os tipos válidos são: caixa, rolo ou unidade." });
+    }
+
+    if (type === "rolo" || type === "unidade") {
+      if (!quantity_mts) {
+        return res.status(400).send({ message: "Dados incompletos" });
+      }
+    }
+
+    if (category !== "cliches" && category !== "facas_rotativas" && category !== "facas_planas" && category !== "facas_graficas" && category !== "outros") {
+      return res.status(400).send({ message: "Categoria de produto inválida. As categorias válidas são: clichês, facas rotativas, facas planas, facas gráficas ou outros." });
     }
 
     const updatedProduct = await productsRepository.updateProduct(name, toughness, dimension, type, category, description, quantity_mts, unitary_value, id);
